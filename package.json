@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.33.7",
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
     "@fortawesome/free-brands-svg-icons": "^7.0.1",
     "@fortawesome/free-regular-svg-icons": "^7.0.1",
@@ -18,9 +19,13 @@
     "@radix-ui/react-slot": "^1.2.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.13",
+    "inngest": "^3.44.3",
     "lucide-react": "^0.544.0",
+    "mongoose": "^8.19.1",
     "next": "15.5.3",
+    "next-auth": "^5.0.0-beta.29",
     "react": "19.1.0",
     "react-bits": "^1.0.5",
     "react-dom": "19.1.0",
