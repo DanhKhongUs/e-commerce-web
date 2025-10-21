@@ -24,7 +24,7 @@ export default function Header() {
 
   const router = useRouter();
   const { openSignIn } = useClerk();
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
 
   const { cart, removeFromCart } = useCart();
   const total = cart.reduce(

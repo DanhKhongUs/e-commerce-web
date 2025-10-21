@@ -1,13 +1,6 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-export interface IUser extends Document {
-  id: string;
-  email: string;
-  name: string;
-  image: string;
-}
-
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema(
   {
     id: { type: String, required: true, unique: true },
     email: { type: String, required: true },
@@ -17,6 +10,5 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-// Tránh lỗi “Cannot overwrite model once compiled”
-export const User =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
+export default User;
