@@ -10,7 +10,7 @@ const images = [
   "/landing/hero4.png",
 ];
 
-export default function Hero() {
+const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
@@ -130,4 +130,6 @@ export default function Hero() {
       </div>
     </div>
   );
-}
+};
+
+export default Hero;

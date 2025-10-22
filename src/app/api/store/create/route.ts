@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import Store from "@/models/Store";
 import User from "@/models/User";
 import imagekit from "@/configs/imageKit";
+import { handleError } from "@/lib/handleError";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
     const email = formData.get("email") as string;
     const contact = formData.get("contact") as string;
     const address = formData.get("address") as string;
-    const images = formData.get("images") as File;
+    const image = formData.get("image") as File;
 
     if (
       !name ||
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       !email ||
       !contact ||
       !address ||
-      !images
+      !image
     ) {
       return NextResponse.json(
         { error: "Missing store info" },
@@ -57,10 +58,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Upload ảnh lên imagekit
-    const buffer = Buffer.from(await images.arrayBuffer());
+    const buffer = Buffer.from(await image.arrayBuffer());
     const response = await imagekit.upload({
       file: buffer,
-      fileName: images.name,
+      fileName: image.name,
       folder: "logos",
     });
 
@@ -88,12 +89,8 @@ export async function POST(req: NextRequest) {
     await User.findOneAndUpdate({ id: userId }, { store: newStore._id });
 
     return NextResponse.json({ message: "Applied, waiting for approval" });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 400 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }
 
@@ -108,11 +105,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ status: "not registered" });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 400 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }

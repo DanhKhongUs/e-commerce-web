@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/db";
+import { handleError } from "@/lib/handleError";
 import authSeller from "@/middlewares/authSeller";
 import Store from "@/models/Store";
 import { getAuth } from "@clerk/nextjs/server";
@@ -22,11 +23,7 @@ export async function GET(req: NextRequest) {
     const storeInfo = await Store.findOne({ userId });
 
     return NextResponse.json({ isSeller, storeInfo });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }

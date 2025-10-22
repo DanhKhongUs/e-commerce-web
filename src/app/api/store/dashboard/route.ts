@@ -1,6 +1,7 @@
 // Get Dashboard Data for Seller (total orders, total earnings, total products)
 
 import { connectDB } from "@/lib/db";
+import { handleError } from "@/lib/handleError";
 import authSeller from "@/middlewares/authSeller";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
@@ -44,11 +45,7 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json({ dashboardData });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }

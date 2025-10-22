@@ -10,7 +10,7 @@ interface Props {
   product: IProduct;
 }
 
-export default function ProductCard({ product }: Props) {
+const ProductCard = ({ product }: Props) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -70,4 +70,6 @@ export default function ProductCard({ product }: Props) {
       </div>
     </div>
   );
-}
+};
+
+export default ProductCard;

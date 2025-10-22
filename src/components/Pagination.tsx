@@ -10,11 +10,11 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export default function Pagination({
+const Pagination = ({
   currentPage,
   totalPages,
   onPageChange,
-}: PaginationProps) {
+}: PaginationProps) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const showLeftArrow = currentPage > 1;
@@ -55,4 +55,6 @@ export default function Pagination({
       )}
     </div>
   );
-}
+};
+
+export default Pagination;

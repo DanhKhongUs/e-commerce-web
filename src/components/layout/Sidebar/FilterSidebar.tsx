@@ -1,4 +1,4 @@
-export default function FilterSidebar() {
+const FilterSidebar = () => {
   return (
     <aside className="w-72 bg-white rounded-xl border shadow p-4 space-y-6">
       <h1 className="text-2xl font-bold">BỘ LỌC</h1>
@@ -37,4 +37,6 @@ export default function FilterSidebar() {
       </div>
     </aside>
   );
-}
+};
+
+export default FilterSidebar;

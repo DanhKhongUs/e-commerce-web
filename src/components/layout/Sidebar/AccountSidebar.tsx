@@ -13,7 +13,7 @@ const menuItems = [
   { id: 3, label: "ĐĂNG XUẤT", to: "/account/logout" },
 ];
 
-export default function AccountSidebar() {
+const AccountSidebar = () => {
   const pathname = usePathname();
   const { formData, currentUser, avatar, setAvatar } = useUserProfile();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,4 +94,6 @@ export default function AccountSidebar() {
       </nav>
     </div>
   );
-}
+};
+
+export default AccountSidebar;

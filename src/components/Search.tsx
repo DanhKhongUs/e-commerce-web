@@ -11,7 +11,7 @@ import {
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function Search() {
+const Search = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<IProduct[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -138,4 +138,6 @@ export default function Search() {
       )}
     </div>
   );
-}
+};
+
+export default Search;

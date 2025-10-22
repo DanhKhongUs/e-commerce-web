@@ -8,10 +8,13 @@ const authAdmin = async (userId: string) => {
 
     const user = await client.users.getUser(userId);
 
-    return process.env.ADMIN_EMAIL?.split(",").includes(
-      user.emailAddresses[0].emailAddress
-    );
-  } catch (error: any) {
+    const email = user.primaryEmailAddress?.emailAddress;
+    if (!email) return false;
+
+    const adminEmail = process.env.ADMIN_EMAIL?.split(",") || [];
+    const isAdmin = adminEmail.includes(email);
+    return isAdmin;
+  } catch (error) {
     console.error(error);
     return false;
   }

@@ -6,7 +6,7 @@ import { Products } from "../../data/product";
 import Pagination from "../Pagination";
 import FilterSidebar from "../layout/Sidebar/FilterSidebar";
 
-export default function Product() {
+const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 12;
@@ -57,4 +57,6 @@ export default function Product() {
       </div>
     </section>
   );
-}
+};
+
+export default Product;

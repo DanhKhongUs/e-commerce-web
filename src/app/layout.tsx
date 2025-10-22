@@ -1,10 +1,14 @@
 import "./globals.css";
-import "@/lib/fontawesome";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import { CartProvider } from "@/context/ProductContext";
-import { AuthProvider } from "@/context/AuthContext";
+import { Outfit } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { CartProvider } from "@/context/ProductContext";
+
+const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600"] });
+
+export const metadata = {
+  title: "E-Commerce. - Shop smarter",
+  description: "E-Commerce. - Shop smarter",
+};
 
 export default function RootLayout({
   children,
@@ -14,16 +18,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="vi" suppressHydrationWarning>
-        <body>
-          <AuthProvider>
-            <CartProvider>
-              <div>
-                <Header />
-                <main>{children}</main>
-                <Footer />
-              </div>
-            </CartProvider>
-          </AuthProvider>
+        <body className={`${outfit.className} antialiased`}>
+          <CartProvider>{children}</CartProvider>
         </body>
       </html>
     </ClerkProvider>

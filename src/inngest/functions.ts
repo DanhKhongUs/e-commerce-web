@@ -1,6 +1,6 @@
 import { inngest } from "./client";
 import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
+import User from "@/models/User";
 
 export const syncUserCreation = inngest.createFunction(
   { id: "sync-user-create" },

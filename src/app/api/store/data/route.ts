@@ -1,4 +1,5 @@
 import { connectDB } from "@/lib/db";
+import { handleError } from "@/lib/handleError";
 import Store from "@/models/Store";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -32,11 +33,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ store });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }

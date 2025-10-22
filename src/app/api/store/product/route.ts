@@ -4,6 +4,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import Product from "@/models/Product";
 import imagekit from "@/configs/imageKit";
+import { handleError } from "@/lib/handleError";
 
 // Add a new product
 export async function POST(req: NextRequest) {
@@ -76,12 +77,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ message: "Product added successfully" });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 400 }
-    );
+  } catch (error: unknown) {
+    return handleError(error);
   }
 }
 
@@ -101,11 +98,7 @@ export async function GET(req: NextRequest) {
     const products = Product.find(storeId);
 
     return NextResponse.json({ products });
-  } catch (error: any) {
-    console.error(error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 400 }
-    );
+  } catch (error) {
+    return handleError(error);
   }
 }
