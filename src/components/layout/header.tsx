@@ -46,7 +46,7 @@ export default function Header() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 w-full mx-auto h-24 px-4 lg:px-16 flex items-center justify-between md:justify-between shadow-md bg-white rounded-b-xl mt-2">
+      <div className="sticky top-0 z-50 w-full mx-auto h-24 px-4 lg:px-24 flex items-center justify-between md:justify-between shadow-md bg-white rounded-b-xl mt-2">
         <button
           className="md:hidden text-2xl"
           onClick={() => setIsNavbarOpen(true)}
@@ -61,17 +61,6 @@ export default function Header() {
               alt="Logo"
               className="w-20 h-24 md:w-26 md:h-28 rounded-full object-cover "
             />
-          </Link>
-
-          <Link to="/products" className="hidden md:flex">
-            <span className="text-lg font-semibold hover:underline">
-              Sản phẩm
-            </span>
-          </Link>
-          <Link to="/blogs" className="hidden md:flex">
-            <span className="text-lg font-semibold hover:underline">
-              Bài viết
-            </span>
           </Link>
         </div>
 

@@ -2,47 +2,33 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../../hooks/useUserProfile";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faFileLines,
   faHouse,
-  faUser,
-} from "@fortawesome/free-regular-svg-icons";
-import {
   faExchangeAlt,
-  faMoneyBillTrendUp,
+  faPlus,
+  faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 const menuItems = [
   {
     id: 0,
-    label: "THỐNG KẾ & BÁO CÁO",
+    label: "Bảng điều khiển",
     to: ".",
-    icon: <FontAwesomeIcon icon={faHouse} />,
+    icon: faHouse,
   },
   {
     id: 1,
-    label: "QUẢN LÝ NGƯỜI DÙNG",
-    to: "users",
-    icon: <FontAwesomeIcon icon={faUser} />,
+    label: "Thêm sản phẩm",
+    to: "addproduct",
+    icon: faPlus,
   },
   {
     id: 2,
-    label: "QUẢN LÝ TIN ĐĂNG",
-    to: "posts",
-    icon: <FontAwesomeIcon icon={faFileLines} />,
-  },
-  {
-    id: 3,
-    label: "QUẢN LÝ GIAO DỊCH",
+    label: "Quản lý giao dịch",
     to: "transactions",
-    icon: <FontAwesomeIcon icon={faExchangeAlt} />,
-  },
-  {
-    id: 4,
-    label: "QUẢN LÝ PHÍ & HOA HỒNG",
-    to: "fees",
-    icon: <FontAwesomeIcon icon={faMoneyBillTrendUp} />,
+    icon: faExchangeAlt,
   },
 ];
+
 export default function AdminSidebar() {
   const { setCurrentUser } = useUserProfile();
   const navigate = useNavigate();
@@ -54,41 +40,54 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-72 bg-white rounded-xl border shadow p-3 space-y-6">
-      <div className="flex items-center cursor-pointer">
+    <aside className="w-72 h-screen flex flex-col bg-white rounded-2xl border shadow-lg p-5">
+      {/* Header logo */}
+      <div className="flex flex-col items-center gap-3 mb-6">
         <img
           src="/logo.png"
           alt="Logo"
-          className="w-26 h-28 rounded-full object-cover "
+          className="w-16 h-16 rounded-full object-cover border border-gray-200"
         />
-        <span className="text-lg font-black">EV & Battery</span>
+        <span className="text-lg font-bold text-blue-600 tracking-wide">
+          E-COMMERCE
+        </span>
       </div>
-      <h1 className="text-md mb-2 border-b pb-4">MAIN MENU</h1>
 
-      <div className="flex flex-col gap-3">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.id}
-            to={item.to}
-            end={item.to === "."}
-            className={({ isActive }) =>
-              `block pb-2 transition ${
-                isActive
-                  ? "text-blue-600 bg-blue-50 rounded-md p-4 font-semibold"
-                  : "text-gray-600 hover:text-blue-500 hover:bg-blue-50 rounded-md p-4"
-              }`
-            }
-          >
-            <span className="mr-1">{item.icon}</span>
-            {item.label}
-          </NavLink>
-        ))}
+      {/* Menu section */}
+      <div className="flex-1 overflow-y-auto">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider border-b pb-2 mb-3">
+          Main Menu
+        </h2>
 
+        <nav className="flex flex-col gap-2">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.id}
+              to={item.to}
+              end={item.to === "."}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  isActive
+                    ? "bg-blue-100 text-blue-700 font-semibold shadow-sm"
+                    : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
+                }`
+              }
+            >
+              <FontAwesomeIcon icon={item.icon} />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      {/* Logout button - always bottom */}
+      <div className="border-t pt-4 mt-auto">
         <button
           onClick={handleLogout}
-          className="text-red-600 border-t hover:bg-red-50 flex rounded-md p-4  font-semibold"
+          className="flex items-center gap-3 px-4 py-4 w-full text-left rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition"
         >
-          ĐĂNG XUẤT
+          <FontAwesomeIcon icon={faSignOutAlt} />
+          <span className="font-medium">Đăng xuất</span>
         </button>
       </div>
     </aside>

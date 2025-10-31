@@ -1,4 +1,4 @@
-export interface Product {
+export interface IProduct {
   id: number;
   name: string;
   img: string;
@@ -9,34 +9,11 @@ export interface Product {
   isFavorite?: boolean;
 }
 
-export interface User {
+export interface IUser {
   id: string;
   name: string;
   email: string;
   password: string;
   avatar: string;
   role?: "member" | "admin";
-}
-
-export interface IBlog {
-  id: string;
-  name: string;
-  brand: string;
-  year: string;
-  condition: string;
-  description: string;
-  images: string[];
-  price?: number;
-}
-
-export interface Listing {
-  id: string;
-  productType?: string;
-  name: string;
-  brand: string;
-  year: string;
-  condition: string;
-  description: string;
-  images: string[];
-  price?: number;
 }

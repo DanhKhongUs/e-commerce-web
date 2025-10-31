@@ -1,4 +1,4 @@
-import httpRequest, { setAccessToken } from "../utils/httpRequest";
+import httpRequest from "../utils/httpRequest";
 
 interface Data {
   email: string;
@@ -14,13 +14,11 @@ export const signup = async (data: Data) => {
 
 export const signin = async (data: Data) => {
   const res = await httpRequest.post("/auth/signin", data);
-  setAccessToken(res.data.data.accessToken);
   return res.data;
 };
 
 export const signout = async () => {
   const { data } = await httpRequest.post("/auth/signout", {});
-  setAccessToken(null);
   return data;
 };
 

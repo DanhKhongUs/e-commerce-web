@@ -90,7 +90,7 @@ export default function DashboardTable() {
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Doanh thu</h2>
 
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={500}>
           <LineChart data={revenueData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
             <XAxis dataKey="month" stroke="#888" />
@@ -108,21 +108,6 @@ export default function DashboardTable() {
               dot={{ r: 4 }}
             />
           </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="bg-white rounded-xl shadow p-6 mt-8">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-          Xu hướng thị trường
-        </h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={revenueData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="month" stroke="#888" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="transactions" fill="#60a5fa" radius={[6, 6, 0, 0]} />
-          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>

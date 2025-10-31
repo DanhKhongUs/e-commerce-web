@@ -16,15 +16,6 @@ module.exports = {
         xl: "1280px",
         "2xl": "1536px",
       },
-      keyframes: {
-        spinSlow: {
-          "0%": { transform: "rotate(360deg)" },
-          "100%": { transform: "rotate(0deg)" },
-        },
-      },
-      animation: {
-        spinSlow: "spinSlow 60s linear infinite",
-      },
     },
   },
   plugins: [],

@@ -13,7 +13,7 @@ const Cart = () => {
           Chưa có sản phẩm nào trong giỏ hàng.
         </h2>
         <Link
-          to="/products"
+          to="/"
           className="bg-[#4a4a4a] text-white px-6 py-2 rounded hover:bg-[#434343]"
         >
           QUAY TRỞ LẠI CỬA HÀNG
