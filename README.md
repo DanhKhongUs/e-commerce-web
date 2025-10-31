@@ -1,6 +1,6 @@
 # Clone & Run code
 
-- git clone https://github.com/DanhKhongUs/EVBatteryReuse.git
+- git clone https://github.com/DanhKhongUs/e-commerce-web.git
 
 - npm install
 
