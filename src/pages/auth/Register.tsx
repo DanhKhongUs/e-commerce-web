@@ -6,7 +6,7 @@ import { useAuth } from "../../context/auth/AuthContext";
 export default function RegisterPage() {
   const { actions } = useAuth();
 
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,8 +22,8 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    const result = await actions.signup({
-      name: username,
+    const result = await actions.register({
+      name,
       email,
       password,
       confirmPassword,
@@ -40,7 +40,7 @@ export default function RegisterPage() {
 
     // Reset form
     setEmail("");
-    setUsername("");
+    setName("");
     setPassword("");
     setConfirmPassword("");
   };
@@ -55,8 +55,8 @@ export default function RegisterPage() {
       <input
         type="text"
         placeholder="Họ và tên"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
         className="w-full border p-2 rounded"
         required
       />

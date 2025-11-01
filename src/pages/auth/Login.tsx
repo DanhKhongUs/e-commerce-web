@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    const result = await actions.signin({ email, password });
+    const result = await actions.login({ email, password });
 
     setIsLoading(false);
 

@@ -62,7 +62,7 @@ export const useAuthProvider = () => {
     fetchAuth();
   }, []);
 
-  const signup = async (credentials: Credentials) => {
+  const register = async (credentials: Credentials) => {
     try {
       const data: APIResponse<User> = await authAPI.signup(credentials);
       if (!data.success) {
@@ -80,7 +80,7 @@ export const useAuthProvider = () => {
     }
   };
 
-  const signin = async (credentials: Credentials) => {
+  const login = async (credentials: Credentials) => {
     try {
       const data: APIResponse<User> = await authAPI.signin(credentials);
 
@@ -101,7 +101,7 @@ export const useAuthProvider = () => {
     }
   };
 
-  const signout = async () => {
+  const logout = async () => {
     try {
       const data: APIResponse<User> = await authAPI.signout();
 
@@ -126,9 +126,9 @@ export const useAuthProvider = () => {
     isAuthenticated,
     isLoading,
     actions: {
-      signup,
-      signin,
-      signout,
+      register,
+      login,
+      logout,
     },
   };
 };

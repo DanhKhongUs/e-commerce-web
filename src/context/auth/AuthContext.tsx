@@ -13,17 +13,17 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   actions: {
-    signup: (credentials: {
+    register: (credentials: {
       name: string;
       email: string;
       password: string;
       confirmPassword: string;
     }) => Promise<{ success: boolean; message?: string }>;
-    signin: (credentials: {
+    login: (credentials: {
       email: string;
       password: string;
     }) => Promise<{ success: boolean; message?: string }>;
-    signout: () => Promise<string | void>;
+    logout: () => Promise<string | void>;
   };
 }
 
