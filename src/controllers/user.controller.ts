@@ -5,14 +5,15 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import { CollectionManager } from "lib/mongodb-wrapper";
 import { IUser } from "types/user";
+import { AuthRequest } from "middleware/auth";
 
 dotenv.config();
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!email || !password)
+    if (!name || !email || !password)
       return res.status(400).json({ error: "ACCOUNT_INVALID" });
 
     const users = new CollectionManager<IUser>("users");
@@ -29,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const password_hash = hmac.digest("hex");
     await col.insertOne({
       email,
+      name,
       password_hash,
       role: "user",
       created_at: new Date(),
@@ -96,5 +98,24 @@ export const logoutUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Logout failed" });
+  }
+};
+
+export const getProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const users = new CollectionManager<IUser>("users");
+
+    const col = await users.getCollection();
+    const user = await col.findOne(
+      { email: req.user?.email },
+      { projection: { password_hash: 0 } }
+    );
+    if (!user)
+      return res.status(404).json({ success: true, message: "USER_NOT_FOUND" });
+
+    return res.json({ success: true, data: user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "INTERNAL_SERVER_ERROR" });
   }
 };
