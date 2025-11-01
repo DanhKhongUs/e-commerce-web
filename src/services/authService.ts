@@ -9,16 +9,16 @@ interface Data {
 }
 
 export const signup = async (data: Data) => {
-  return (await httpRequest.post("/auth/signup", data)).data;
+  return (await httpRequest.post("/auth/register", data)).data;
 };
 
 export const signin = async (data: Data) => {
-  const res = await httpRequest.post("/auth/signin", data);
+  const res = await httpRequest.post("/auth/login", data);
   return res.data;
 };
 
 export const signout = async () => {
-  const { data } = await httpRequest.post("/auth/signout", {});
+  const { data } = await httpRequest.post("/auth/logout", {});
   return data;
 };
 

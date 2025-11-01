@@ -35,7 +35,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
-    await actions.signout();
+    await actions.logout();
     window.location.href = "/";
   };
 
@@ -192,12 +192,6 @@ export default function Header() {
                     >
                       Quản lý hồ sơ
                     </Link>
-                    <Link
-                      to="/sellVehicle"
-                      className="block w-full text-left text-gray-700 hover:bg-sky-100 hover:text-sky-800 rounded px-3 py-2 transition"
-                    >
-                      Đăng tin
-                    </Link>
 
                     <button
                       onClick={handleLogout}
@@ -275,13 +269,7 @@ export default function Header() {
               >
                 Quản lý hồ sơ
               </Link>
-              <Link
-                to="/products"
-                onClick={() => setIsNavbarOpen(false)}
-                className="block w-full text-left text-gray-700 rounded transition border-t pt-4"
-              >
-                Sản phẩm
-              </Link>
+
               <button
                 onClick={handleLogout}
                 className="block w-full text-left text-red-600 rounded transition border-t pt-4"

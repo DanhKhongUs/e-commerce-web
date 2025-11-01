@@ -5,7 +5,6 @@ export default function MemberLayout() {
   const location = useLocation();
 
   const getCurrentLabel = (pathname: string) => {
-    if (pathname.endsWith("/account/address")) return "ĐỊA CHỈ";
     if (pathname.endsWith("/account/transactionHistory"))
       return "LỊCH SỬ GIAO DỊCH";
     return "THÔNG TIN CÁ NHÂN";

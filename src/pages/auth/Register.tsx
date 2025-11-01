@@ -32,11 +32,9 @@ export default function RegisterPage() {
     console.log(result);
     setIsLoading(false);
 
-    if (typeof result === "string") {
-      return;
+    if (result.success) {
+      navigate("/login");
     }
-
-    navigate("/login");
 
     // Reset form
     setEmail("");

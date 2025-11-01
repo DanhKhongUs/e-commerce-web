@@ -6,9 +6,7 @@ import { useAuth } from "../../../context/auth/AuthContext";
 
 const menuItems = [
   { id: 0, label: "THÔNG TIN CÁ NHÂN", to: "." },
-  { id: 1, label: "ĐỊA CHỈ", to: "address" },
-  { id: 2, label: "LỊCH SỬ GIAO DỊCH", to: "transactionHistory" },
-  { id: 3, label: "ĐĂNG XUẤT", to: "logout" },
+  { id: 1, label: "LỊCH SỬ GIAO DỊCH", to: "transactionHistory" },
 ];
 
 export default function AccountSidebar() {

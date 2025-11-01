@@ -8,13 +8,11 @@ import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import LoginPage from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/Register";
-import Address from "./pages/member/Address";
 import Profile from "./pages/member/Profile";
 import TransactionHistory from "./pages/member/TransactionHistory";
 import ProductDetailPage from "./pages/product/ProductDetailPage";
 import Cart from "./pages/product/Cart";
 import Checkout from "./pages/product/CheckOut";
-import SellVehiclePage from "./pages/member/SellVehiclePage";
 import MemberLayout from "./components/layout/MemberLayout";
 import AdminLayout from "./components/layout/AdminLayout";
 import DashBoard from "./pages/admin/DashBoard";
@@ -37,7 +35,6 @@ function AppContent() {
       {!isAdminPage && !isAuthPage && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/sellVehicle" element={<SellVehiclePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/products/:id" element={<ProductDetailPage />} />
@@ -45,14 +42,13 @@ function AppContent() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/account" element={<MemberLayout />}>
           <Route index element={<Profile />} />
-          <Route path="address" element={<Address />} />
           <Route path="transactionHistory" element={<TransactionHistory />} />
         </Route>
         {/* <Route element={<ProtectedRoute requiredRole="admin" />}> */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="transactions" element={<Transactions />} />
-          <Route path="addproduct" element={<AddProduct />} />
+          <Route path="products" element={<AddProduct />} />
         </Route>
         {/* </Route> */}
       </Routes>
