@@ -12,7 +12,7 @@ const menuItems = [
 ];
 
 export default function AccountSidebar() {
-  const { formData, avatar, setAvatar } = useUserProfile();
+  const { avatar, setAvatar } = useUserProfile();
 
   const { user } = useAuth();
 

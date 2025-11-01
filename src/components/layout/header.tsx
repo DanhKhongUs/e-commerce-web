@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
@@ -14,9 +14,6 @@ import { useAuth } from "../../context/auth/AuthContext";
 
 export default function Header() {
   const { isAuthenticated, user, actions, isLoading } = useAuth();
-
-  const navigate = useNavigate();
-
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +36,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     await actions.signout();
-    navigate("/");
+    window.location.href = "/";
   };
 
   if (isLoading) return null;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/auth/AuthContext";
 
 export default function LoginPage() {
@@ -10,8 +10,6 @@ export default function LoginPage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -20,7 +18,7 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (result.success) {
-      navigate("/");
+      window.location.href = "/";
     }
   };
 
