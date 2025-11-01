@@ -2,7 +2,8 @@ import express, { Application } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import connectDB from "config/db";
+import { Database } from "lib/mongodb-wrapper";
+import authRoutes from "./routes/auth.route";
 
 dotenv.config();
 const app: Application = express();
@@ -21,13 +22,17 @@ app.use(
   })
 );
 
-connectDB()
-  .then(async () => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
+app.use("/api/auth", authRoutes);
+
+const db = Database.getInstance();
+db.connect()
+  .then(() => {
+    console.log("MongoDB connected successfully");
   })
-  .catch((error) => {
-    console.error("Cannot connect to MongoDB", error);
-    process.exit(1);
+  .catch((err) => {
+    console.error("MongoDB connection failed.", err);
   });
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
