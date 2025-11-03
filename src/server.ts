@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { Database } from "lib/mongodb-wrapper";
 import authRoutes from "./routes/auth.route";
+import productRoutes from "./routes/product.route";
 
 dotenv.config();
 const app: Application = express();
@@ -23,6 +24,7 @@ app.use(
 );
 
 app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
 
 const db = Database.getInstance();
 db.connect()

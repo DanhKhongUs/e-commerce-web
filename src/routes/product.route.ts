@@ -1,21 +1,21 @@
+import {
+  createProduct,
+  deleteProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+} from "controllers/product.controller";
 import express from "express";
 import { requireAdmin, verifyToken } from "middleware/auth";
 
 const router = express.Router();
-router.get("/", (req, res) => {
-  res.json({ message: "List of products" });
-});
+router.get("/", getAllProducts);
+router.get("/:id", getProductById);
 
-router.post("/", verifyToken, requireAdmin, (req, res) => {
-  res.json({ message: "Product created successfully" });
-});
+router.post("/", verifyToken, createProduct);
 
-router.put("/:id", verifyToken, requireAdmin, (req, res) => {
-  res.json({ message: `Product ${req.params.id} updated` });
-});
+router.put("/:id", verifyToken, updateProduct);
 
-router.delete("/:id", verifyToken, requireAdmin, (req, res) => {
-  res.json({ message: `Product ${req.params.id} deleted` });
-});
+router.delete("/:id", verifyToken, deleteProduct);
 
 export default router;

@@ -3,8 +3,6 @@ import { userCollection } from "models/user.model";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import dotenv from "dotenv";
-import { CollectionManager } from "lib/mongodb-wrapper";
-import { IUser } from "types/user";
 import { AuthRequest } from "middleware/auth";
 
 dotenv.config();
@@ -16,9 +14,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (!name || !email || !password)
       return res.status(400).json({ error: "ACCOUNT_INVALID" });
 
-    const users = new CollectionManager<IUser>("users");
-
-    const col = await users.getCollection();
+    const col = await userCollection.getCollection();
 
     const exists = await col.findOne({ email });
 
@@ -50,8 +46,7 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!email || !password)
       return res.status(400).json({ error: "ACCOUNT_INVALID" });
 
-    const users = new CollectionManager<IUser>("users");
-    const col = await users.getCollection();
+    const col = await userCollection.getCollection();
 
     const user = await col.findOne(
       { email },
@@ -103,9 +98,7 @@ export const logoutUser = async (req: Request, res: Response) => {
 
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
-    const users = new CollectionManager<IUser>("users");
-
-    const col = await users.getCollection();
+    const col = await userCollection.getCollection();
     const user = await col.findOne(
       { email: req.user?.email },
       { projection: { password_hash: 0 } }
