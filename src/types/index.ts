@@ -1,12 +1,11 @@
 export interface IProduct {
-  id: number;
+  id: string;
   name: string;
-  img: string;
+  imageUrl: string;
   price: number;
-  rating: number;
   discount: number;
+  product_date?: Date;
   description?: string;
-  isFavorite?: boolean;
 }
 
 export interface IUser {

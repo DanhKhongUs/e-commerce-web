@@ -1,10 +1,11 @@
-import type { Product } from "../types";
+import { IProduct } from "../types";
 
-export const Products: Product[] = [
+export const Products: IProduct[] = [
   {
     id: 0,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "https://cdn.dribbble.com/userupload/43024992/file/original-66f7171d3182186eb50fdff3ad09f2a9.jpg?resize=752x&vertical=center",
+    imageUrl:
+      "https://cdn.dribbble.com/userupload/43024992/file/original-66f7171d3182186eb50fdff3ad09f2a9.jpg?resize=752x&vertical=center",
     price: 690000,
     rating: 4.5,
     description:
@@ -14,7 +15,8 @@ export const Products: Product[] = [
   {
     id: 1,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "https://down-vn.img.susercontent.com/file/vn-11134201-7ra0g-m7qpnjs9ydkjcf.webp",
+    imageUrl:
+      "https://down-vn.img.susercontent.com/file/vn-11134201-7ra0g-m7qpnjs9ydkjcf.webp",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -22,7 +24,7 @@ export const Products: Product[] = [
   {
     id: 2,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -30,7 +32,7 @@ export const Products: Product[] = [
   {
     id: 3,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -38,7 +40,7 @@ export const Products: Product[] = [
   {
     id: 4,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 4,
     discount: 30,
@@ -46,7 +48,7 @@ export const Products: Product[] = [
   {
     id: 5,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -54,7 +56,7 @@ export const Products: Product[] = [
   {
     id: 6,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -62,7 +64,7 @@ export const Products: Product[] = [
   {
     id: 7,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -70,7 +72,7 @@ export const Products: Product[] = [
   {
     id: 8,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 4,
     discount: 30,
@@ -78,7 +80,7 @@ export const Products: Product[] = [
   {
     id: 9,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -86,7 +88,7 @@ export const Products: Product[] = [
   {
     id: 10,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -94,7 +96,7 @@ export const Products: Product[] = [
   {
     id: 11,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -102,7 +104,7 @@ export const Products: Product[] = [
   {
     id: 12,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 4,
     discount: 30,
@@ -110,7 +112,7 @@ export const Products: Product[] = [
   {
     id: 13,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -118,7 +120,7 @@ export const Products: Product[] = [
   {
     id: 14,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -126,7 +128,7 @@ export const Products: Product[] = [
   {
     id: 15,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -134,7 +136,7 @@ export const Products: Product[] = [
   {
     id: 16,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 4,
     discount: 30,
@@ -142,7 +144,7 @@ export const Products: Product[] = [
   {
     id: 17,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -150,7 +152,7 @@ export const Products: Product[] = [
   {
     id: 18,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,
@@ -158,7 +160,7 @@ export const Products: Product[] = [
   {
     id: 19,
     name: "Tai nghe Bluetooth Pro 3000mmh - chống ồn chủ động",
-    img: "/images/airpods.png",
+    imageUrl: "/images/airpods.png",
     price: 690000,
     rating: 5,
     discount: 30,

@@ -5,7 +5,8 @@ export default function AdminLayout() {
   const location = useLocation();
 
   const getCurrentLabel = (pathname: string) => {
-    if (pathname === "/admin/addproduct") return "THÊM SẢN PHẨM";
+    if (pathname === "/admin/categories") return "QUẢN LÝ LOẠI";
+    if (pathname === "/admin/products") return "THÊM SẢN PHẨM";
     if (pathname === "/admin/transactions") return "QUẢN LÝ GIAO DỊCH";
     return "THỐNG KÊ & BÁO CÁO";
   };

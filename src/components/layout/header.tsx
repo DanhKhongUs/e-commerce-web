@@ -7,7 +7,7 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import Search from "../form/Search";
+import Search from "../Search";
 import * as Popover from "@radix-ui/react-popover";
 import { useCart } from "../../context/ProductContext";
 import { useAuth } from "../../context/auth/AuthContext";
@@ -91,7 +91,7 @@ export default function Header() {
                           <div className="flex items-start gap-4 border-b pb-4">
                             <Link to={`cart/${item.product.id}`}>
                               <img
-                                src={item.product.img}
+                                src={item.product.imageUrl}
                                 alt={item.product.name}
                                 className="w-16 h-16 object-cover rounded-lg"
                               />

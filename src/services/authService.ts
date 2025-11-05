@@ -23,5 +23,5 @@ export const signout = async () => {
 };
 
 export const checkAuth = async () => {
-  return (await httpRequest.get("/auth/profile")).data;
+  return (await httpRequest.get("/users")).data;
 };

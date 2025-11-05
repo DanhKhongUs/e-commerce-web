@@ -1,14 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import type { Product } from "../types";
-
+import { IProduct } from "../types";
 interface CartItem {
-  product: Product;
+  product: IProduct;
   quantity: number;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: IProduct, quantity?: number) => void;
   removeFromCart: (productId: number) => void;
   clearCart: () => void;
 }
@@ -25,7 +24,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const addToCart = (product: IProduct, quantity: number = 1) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {

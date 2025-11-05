@@ -18,7 +18,8 @@ import AdminLayout from "./components/layout/AdminLayout";
 import DashBoard from "./pages/admin/DashBoard";
 import Transactions from "./pages/admin/Transactions";
 import Home from "./pages/home/Home";
-import AddProduct from "./pages/admin/AddProduct";
+import AddProductPage from "./pages/admin/AddProduct";
+import CategoryPage from "./pages/admin/Category";
 
 function AppContent() {
   const location = useLocation();
@@ -48,7 +49,8 @@ function AppContent() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashBoard />} />
           <Route path="transactions" element={<Transactions />} />
-          <Route path="products" element={<AddProduct />} />
+          <Route path="products" element={<AddProductPage />} />
+          <Route path="categories" element={<CategoryPage />} />
         </Route>
         {/* </Route> */}
       </Routes>

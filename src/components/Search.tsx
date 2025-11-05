@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Product } from "../../types";
-import { Products } from "../../data/product";
+import { IProduct } from "../types";
+import { Products } from "../data/product";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleXmark,
@@ -10,7 +10,7 @@ import {
 
 export default function Search() {
   const [search, setSearch] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
+  const [results, setResults] = useState<IProduct[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -108,7 +108,7 @@ export default function Search() {
                 className="flex items-center gap-4 px-4 py-2 border-b hover:bg-gray-100 cursor-pointer"
               >
                 <img
-                  src={item.img}
+                  src={item.imageUrl}
                   alt={item.name}
                   className="w-16 h-16 rounded object-cover"
                 />

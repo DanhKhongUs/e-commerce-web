@@ -1,9 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Product } from "../../types";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { IProduct } from "../../types";
 import { useNavigate } from "react-router-dom";
 interface Props {
-  product: Product;
+  product: IProduct;
 }
 
 export default function ProductCard({ product }: Props) {
@@ -19,7 +17,7 @@ export default function ProductCard({ product }: Props) {
     >
       <div className="relative">
         <img
-          src={product.img}
+          src={product.imageUrl}
           alt={product.name}
           className="w-full h-52 object-cover"
         />
@@ -37,23 +35,7 @@ export default function ProductCard({ product }: Props) {
           <div className="flex items-center gap-2">
             <span className="text-gray-600">Giá: </span>
             <span className="text-red-600 font-semibold text-lg">
-              {product.price.toLocaleString("vi-VN")}₫
-            </span>
-          </div>
-          <div className="flex items-center gap-1 text-yellow-500">
-            {[...Array(5)].map((_, i) => (
-              <FontAwesomeIcon
-                icon={faStar}
-                key={i}
-                className={`h-3 w-3 ${
-                  i < product.rating
-                    ? "text-yellow-500 fill-yellow-500"
-                    : "text-gray-300"
-                }`}
-              />
-            ))}
-            <span className="ml-2 text-sm font-medium text-gray-700">
-              {product.rating.toFixed(1)}
+              {product.price.toLocaleString("vi-VN")} VND
             </span>
           </div>
         </div>

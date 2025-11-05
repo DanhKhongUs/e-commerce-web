@@ -39,7 +39,7 @@ export default function ProductDetail() {
     <div className="flex flex-col md:flex-row gap-10">
       <div className="relative max-h-[600px] max-w-[600px]">
         <img
-          src={product.img}
+          src={product.imageUrl}
           alt={product.name}
           className="rounded-xl w-full h-full object-cover"
         />

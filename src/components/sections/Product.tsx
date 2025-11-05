@@ -1,22 +1,28 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import ProductCard from "../product/ProductCard";
 import { Products } from "../../data/product";
 import Pagination from "../product/Pagination";
+import { getAllProducts } from "../../services/productService";
+import { IProduct } from "../../types";
 
 const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<IProduct[]>([]);
 
   const ITEMS_PER_PAGE = 12;
   const totalPages = Math.ceil(Products.length / ITEMS_PER_PAGE);
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const allProducts = Products.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [currentPage]);
+    const fetchProduct = async () => {
+      try {
+        const res = await getAllProducts();
+        setProducts(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProduct();
+  }, []);
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden px-8 mt-12 p-6">
@@ -28,7 +34,7 @@ const Product = () => {
                 Có <span className="underline">{Products.length}</span> sản phẩm
               </h2>
 
-              <div className="lg:hidden flex border text-sm border-gray-700">
+              <div className="flex border text-sm border-gray-700">
                 <select name="Chose" className="p-1">
                   <option value="allProduct">Tất cả sản phẩm</option>
                   <option value="saab">Xe</option>
@@ -39,7 +45,7 @@ const Product = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mt-4">
-            {allProducts.map((p) => (
+            {products.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

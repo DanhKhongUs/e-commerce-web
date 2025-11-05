@@ -1,3 +1,9 @@
-export default function AddProduct() {
-  return <div>Add product</div>;
+import ProductManager from "../../components/admin/ProductManage";
+
+export default function AddProductPage() {
+  return (
+    <div>
+      <ProductManager />
+    </div>
+  );
 }

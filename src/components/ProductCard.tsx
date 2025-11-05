@@ -1,5 +1,3 @@
-"use client";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { IProduct } from "../types";
@@ -23,7 +21,7 @@ const ProductCard = ({ product }: Props) => {
     >
       <div className="relative">
         <img
-          src={product.img}
+          src={product.imageUrl}
           alt={product.name}
           className="w-full h-60 object-cover"
         />
