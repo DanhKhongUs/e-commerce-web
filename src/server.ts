@@ -3,15 +3,17 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { Database } from "lib/mongodb-wrapper";
+import usersRoutes from "./routes/users.route";
 import authRoutes from "./routes/auth.route";
 import productRoutes from "./routes/product.route";
+import adminRoutes from "./routes/admin.route";
 
 dotenv.config();
 const app: Application = express();
 const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use(cookieParser());
 
@@ -23,8 +25,10 @@ app.use(
   })
 );
 
+app.use("/api", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/admin", adminRoutes);
 
 const db = Database.getInstance();
 db.connect()

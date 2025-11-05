@@ -96,7 +96,7 @@ export const logoutUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getProfile = async (req: AuthRequest, res: Response) => {
+export const users = async (req: AuthRequest, res: Response) => {
   try {
     const col = await userCollection.getCollection();
     const user = await col.findOne(

@@ -14,13 +14,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const col = await productCollection.getCollection();
 
-    const { page = 1, limit = 10 } = req.query;
-
-    const products = await col
-      .find()
-      .skip((Number(page) - 1) * Number(limit))
-      .limit(Number(limit))
-      .toArray();
+    const products = await col.find().sort({ createdAt: -1 }).toArray();
 
     const formattedProducts = products.map((product) => ({
       ...product,
@@ -28,7 +22,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       _id: undefined,
     }));
 
-    res.json({ success: true, data: formattedProducts });
+    return res.json({ success: true, data: formattedProducts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -53,7 +47,7 @@ export const getProductById = async (req: Request, res: Response) => {
       id: id,
     };
 
-    res.json({ success: true, data: formattedProduct });
+    return res.json({ success: true, data: formattedProduct });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -73,13 +67,18 @@ export const createProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Data are required" });
     const col = await productCollection.getCollection();
 
+    let finalImageUrl = imageUrl;
+    if (req.file) {
+      finalImageUrl = `/uploads/${req.file.filename}`;
+    }
+
     const newProduct = {
       _id: new ObjectId(),
       name,
       price,
       discount,
       description,
-      imageUrl,
+      imageUrl: finalImageUrl || "",
       createAt: new Date(),
       updateAt: new Date(),
     };
@@ -100,7 +99,9 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const updateProduct = async (req: Request, res: Response) => {
   try {
-    const { id, name, price, discount, description, imageUrl } = req.body;
+    const { id } = req.params;
+
+    const { name, price, discount, description, imageUrl } = req.body;
     const validateError = validateProductData(req.body);
     if (validateError) {
       return res.status(400).json(validateError);
@@ -141,7 +142,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
 
     if (!id || !ObjectId.isValid(id))
       return res.status(400).json({ error: "Product ID is required" });

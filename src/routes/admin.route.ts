@@ -1,8 +1,19 @@
+import {
+  createCategory,
+  deleteCategory,
+  getAllCategories,
+  getCategoryById,
+  updateCategory,
+} from "controllers/category.controller";
 import express from "express";
-import { requireAdmin, verifyToken } from "middleware/auth";
+import { verifyToken } from "middleware/auth";
 
 const router = express.Router();
 
-router.get("/dashboard", verifyToken, requireAdmin, (req, res) => {
-  res.json({ message: "Welcome admin" });
-});
+router.get("/categories", getAllCategories);
+router.get("/categories/:id", getCategoryById);
+router.post("/categories", verifyToken, createCategory);
+router.put("/categories/:id", verifyToken, updateCategory);
+router.delete("/categories/:id", verifyToken, deleteCategory);
+
+export default router;
