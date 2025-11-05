@@ -2,14 +2,6 @@ import { Request, Response } from "express";
 import { productCollection } from "models/product.model";
 import { ObjectId } from "mongodb";
 
-const validateProductData = (data: any) => {
-  const { name, price, discount, description } = data;
-  if (!name || !price || !discount || !description) {
-    return { error: "All fields are require" };
-  }
-  return null;
-};
-
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const col = await productCollection.getCollection();
@@ -22,7 +14,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
       _id: undefined,
     }));
 
-    return res.json({ success: true, data: formattedProducts });
+    res.json({ success: true, data: formattedProducts });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -47,7 +39,7 @@ export const getProductById = async (req: Request, res: Response) => {
       id: id,
     };
 
-    return res.json({ success: true, data: formattedProduct });
+    res.json({ success: true, data: formattedProduct });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -56,31 +48,26 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const validateError = validateProductData(req.body);
-    if (validateError) {
-      return res.status(400).json(validateError);
-    }
+    const { name, price, discount, description, category, imageUrl } = req.body;
 
-    const { name, price, discount, description, imageUrl } = req.body;
-
-    if (!name || !price || !discount || !description || !imageUrl)
+    if (!name || !price || !discount || !description || !imageUrl || !category)
       return res.status(400).json({ error: "Data are required" });
-    const col = await productCollection.getCollection();
 
-    let finalImageUrl = imageUrl;
-    if (req.file) {
-      finalImageUrl = `/uploads/${req.file.filename}`;
-    }
+    if (!ObjectId.isValid(category))
+      return res.status(400).json({ error: "Invalid category ID" });
+
+    const col = await productCollection.getCollection();
 
     const newProduct = {
       _id: new ObjectId(),
       name,
       price,
       discount,
+      category,
       description,
-      imageUrl: finalImageUrl || "",
-      createAt: new Date(),
-      updateAt: new Date(),
+      imageUrl: imageUrl || "",
+      created_at: new Date(),
+      updated_at: new Date(),
     };
 
     const result = await col.insertOne(newProduct);
@@ -90,7 +77,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     const insertedProduct = { ...newProduct, id: newProduct._id.toString() };
 
-    return res.status(200).json({ success: true, product: insertedProduct });
+    res.status(200).json({ success: true, product: insertedProduct });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -101,22 +88,20 @@ export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const { name, price, discount, description, imageUrl } = req.body;
-    const validateError = validateProductData(req.body);
-    if (validateError) {
-      return res.status(400).json(validateError);
-    }
+    const { name, price, discount, category, description, imageUrl } = req.body;
 
-    if (!ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid Product ID" });
+    if (!name || !price || !discount || !description || !imageUrl || !category)
+      return res.status(400).json({ error: "Data are required" });
+
+    if (!ObjectId.isValid(id) || !ObjectId.isValid(category)) {
+      return res.status(400).json({ error: "Invalid ID" });
     }
 
     const col = await productCollection.getCollection();
-    const _id = new ObjectId(id);
 
     const result = await col.updateOne(
       {
-        _id,
+        _id: new ObjectId(id),
       },
       {
         $set: {
@@ -124,8 +109,9 @@ export const updateProduct = async (req: Request, res: Response) => {
           price,
           discount,
           description,
+          category,
           imageUrl,
-          update_at: new Date(),
+          updated_at: new Date(),
         },
       }
     );
@@ -133,7 +119,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (result.modifiedCount === 0) {
       return res.status(500).json({ error: "Failed to update product" });
     }
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });
@@ -155,7 +141,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });

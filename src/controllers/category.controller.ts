@@ -8,29 +8,11 @@ export const getAllCategories = async (req: Request, res: Response) => {
 
     const categories = await col
       .find()
-      .sort({ createdAt: -1 })
-      .project({ createdAt: 0 })
+      .sort({ created_at: -1 })
+      .project({ created_at: 0 })
       .toArray();
 
-    return res.json({ success: true, data: categories });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
-  }
-};
-
-export const getCategoryById = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    if (!ObjectId.isValid(id))
-      return res.status(400).json({ error: "Data are require" });
-
-    const col = await categoryCollection.getCollection();
-    const category = await col.findOne({ _id: new ObjectId(id) });
-
-    if (!category) return res.status(404).json({ error: "Category not found" });
-
-    return res.json({ success: true, data: category });
+    res.json({ success: true, data: categories });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -51,12 +33,17 @@ export const createCategory = async (req: Request, res: Response) => {
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "");
 
-    const response = await col.updateOne(
+    const exists = await col.findOne({ category_id: format_category_id });
+    if (exists)
+      return res.status(400).json({ error: "CATEGORY_ALREADY_EXISTS" });
+
+    await col.updateOne(
       {
         category_id: format_category_id,
       },
       {
         $setOnInsert: {
+          category_id: format_category_id,
           category_name,
           created_at: new Date(),
         },
@@ -64,10 +51,7 @@ export const createCategory = async (req: Request, res: Response) => {
       { upsert: true }
     );
 
-    if (response.upsertedCount === 0)
-      return res.status(400).json({ error: "CATEGORY_ALREADY_EXISTS" });
-
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -76,15 +60,10 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-
-    const { category_id, category_name } = req.body;
+    const { _id, category_id, category_name } = req.body;
 
     if (!category_id || !category_name)
       return res.status(400).json({ error: "INVALID_DATA" });
-
-    if (!ObjectId.isValid(id))
-      return res.status(400).json({ error: "Invalid Category ID" });
 
     const format_category_id = category_id
       .toLowerCase()
@@ -93,14 +72,13 @@ export const updateCategory = async (req: Request, res: Response) => {
 
     const col = await categoryCollection.getCollection();
 
-    const _id = new ObjectId(id);
     const result = await col.updateOne(
       {
-        _id,
+        _id: new ObjectId(_id),
       },
       {
         $set: {
-          category_id,
+          category_id: format_category_id,
           category_name,
           updated_at: new Date(),
         },
@@ -110,7 +88,7 @@ export const updateCategory = async (req: Request, res: Response) => {
     if (result.modifiedCount === 0)
       return res.status(500).json({ error: "Failed to update category" });
 
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -119,19 +97,18 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-
-    if (!id || !ObjectId.isValid(id))
+    const { category_id } = req.body;
+    if (!category_id)
       return res.status(400).json({ error: "Category ID is required" });
 
     const col = await categoryCollection.getCollection();
 
-    const result = await col.deleteOne({ _id: new ObjectId(id) });
+    const result = await col.deleteOne({ category_id });
 
     if (result.deletedCount === 0)
       return res.status(404).json({ error: "Category not found" });
 
-    return res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
