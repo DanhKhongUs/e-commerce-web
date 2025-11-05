@@ -1,23 +1,36 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Products } from "../../data/product";
+import { useEffect, useState } from "react";
 import { useCart } from "../../context/ProductContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartPlus, faStar } from "@fortawesome/free-solid-svg-icons";
+import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
+import { IProduct } from "../../types";
+import { getProductById } from "../../services/productService";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const productId = Number(id);
 
-  const product = Products.find((p) => p.id === productId);
+  const [product, setProduct] = useState<IProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
 
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        if (!id) return;
+        const data = await getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error("Lỗi khi tải sản phẩm:", error);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
   if (!product) {
     return (
       <div className="text-center py-10 text-gray-700 font-semibold max-w-screen-xl mx-auto bg-[#fdfbf5]">
-        Sản phẩm không tồn tại.
+        Đang tải sản phẩm...
       </div>
     );
   }
@@ -31,10 +44,9 @@ export default function ProductDetail() {
   };
 
   const handleBuyNow = () => {
-    addToCart(product);
+    addToCart(product, quantity);
     navigate("/cart");
   };
-
   return (
     <div className="flex flex-col md:flex-row gap-10">
       <div className="relative max-h-[600px] max-w-[600px]">
@@ -47,22 +59,7 @@ export default function ProductDetail() {
 
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-gray-700">{product.name}</h1>
-        <div className="flex items-center gap-1 text-yellow-500">
-          {[...Array(5)].map((_, i) => (
-            <FontAwesomeIcon
-              icon={faStar}
-              key={i}
-              className={`h-3 w-3 ${
-                i < product.rating
-                  ? "text-yellow-500 fill-yellow-500"
-                  : "text-gray-300"
-              }`}
-            />
-          ))}
-          <span className="ml-2 text-sm font-medium text-gray-700">
-            {product.rating.toFixed(1)}
-          </span>
-        </div>
+
         <p className="text-xl text-red-600 font-semibold">
           <span className="text-gray-600">Giá: </span>
           {parseInt(product.price.toString()).toLocaleString()}đ

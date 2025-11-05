@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { User } from "../types";
+import { IUser } from "../types";
 
 export interface UserProfile {
   name: string;
@@ -9,7 +9,7 @@ export interface UserProfile {
 }
 
 export function useUserProfile() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const [formData, setFormData] = useState<UserProfile>({
     name: "",
     phone: "",

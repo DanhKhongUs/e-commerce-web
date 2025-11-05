@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { Modal } from "antd";
-import { IProduct } from "../../types";
+import { ICategory, IProduct } from "../../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -11,9 +11,11 @@ import {
   getAllProducts,
 } from "../../services/productService";
 import { toast } from "react-toastify";
+import { getAllCategories } from "../../services/categoryService";
 
 export default function ProductManager() {
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -23,6 +25,7 @@ export default function ProductManager() {
     id: "",
     name: "",
     imageUrl: "",
+    category: "",
     price: 0,
     discount: 0,
     description: "",
@@ -31,12 +34,12 @@ export default function ProductManager() {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async (page: number = currentPage) => {
     try {
       const res = await getAllProducts();
-      console.log(res);
       setProducts(
         res.data.map((p: IProduct) => ({
           ...p,
@@ -50,6 +53,16 @@ export default function ProductManager() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const res = await getAllCategories();
+      setCategories(res.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Không tải được danh mục sản phẩm");
+    }
+  };
+
   const handleOpen = async (editProduct?: IProduct) => {
     if (editProduct) {
       setIsEdit(true);
@@ -58,6 +71,8 @@ export default function ProductManager() {
         const productData = res.data.product;
         setNewProduct({
           ...productData,
+          category:
+            productData.category?.category_id || productData.category || "",
           product_date: new Date(productData.product_date),
           imageUrl: productData.imageUrl || "",
         });
@@ -73,6 +88,7 @@ export default function ProductManager() {
         name: "",
         price: 0,
         description: "",
+        category: "",
         discount: 0,
         imageUrl: "",
         product_date: new Date(),
@@ -90,6 +106,7 @@ export default function ProductManager() {
       price: 0,
       description: "",
       discount: 0,
+      category: "",
       imageUrl: "",
       product_date: new Date(),
     });
@@ -97,7 +114,9 @@ export default function ProductManager() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setNewProduct({ ...newProduct, [name]: value });
@@ -118,6 +137,11 @@ export default function ProductManager() {
 
   const handleSave = async () => {
     try {
+      if (!newProduct.category) {
+        toast.error("Vui lòng chọn danh mục sản phẩm!");
+        return;
+      }
+
       if (isEdit) {
         await updateProduct(newProduct);
         toast.success("Đã cập nhật sản phẩm thành công.");
@@ -167,7 +191,7 @@ export default function ProductManager() {
             <th className="p-3">ẢNH</th>
             <th className="p-3">TÊN</th>
             <th className="p-3">GIÁ</th>
-            <th className="p-3">GIẢM GIÁ (%)</th>
+            <th className="p-3">DANH MỤC</th>
             <th className="p-3">NGÀY TẠO</th>
             <th className="p-3 text-center">HÀNH ĐỘNG</th>
           </tr>
@@ -177,18 +201,19 @@ export default function ProductManager() {
             <tr key={p.id} className="border-b hover:bg-gray-50">
               <td className="p-3">
                 <img
-                  src={p.imageUrl}
+                  src={p.imageUrl || "/default-product.jpg"}
                   alt={p.name}
                   className="w-16 h-16 object-cover rounded-md border"
                 />
               </td>
               <td className="p-3 font-medium">{p.name}</td>
               <td className="p-3">{p.price.toLocaleString()} ₫</td>
-              <td className="p-3">{p.discount}%</td>
               <td className="p-3">
-                {p.product_date
-                  ? new Date(p.product_date).toLocaleDateString()
-                  : "-"}
+                {categories.find((c) => c.category_id === p.category)
+                  ?.category_name || "Không có danh mục"}
+              </td>
+              <td className="p-3">
+                {new Date(p.product_date ?? "").toLocaleDateString("vi-VN")}
               </td>
               <td className="p-3 flex justify-center gap-4">
                 <FontAwesomeIcon
@@ -224,6 +249,28 @@ export default function ProductManager() {
               placeholder="Nhập tên sản phẩm..."
               className="w-full border rounded-md p-2"
             />
+          </div>
+
+          <div>
+            <label className="block text-gray-600 mb-1">Danh mục:</label>
+            <select
+              name="category"
+              value={newProduct.category}
+              onChange={(e) => {
+                setNewProduct((prev) => ({
+                  ...prev,
+                  category: e.target.value,
+                }));
+              }}
+              className="w-full border rounded-md p-2"
+            >
+              <option value="">-- Chọn danh mục --</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.category_name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

@@ -6,7 +6,6 @@ import {
   faExchangeAlt,
   faPlus,
   faSignOutAlt,
-  faList,
 } from "@fortawesome/free-solid-svg-icons";
 
 const menuItems = [
@@ -16,20 +15,15 @@ const menuItems = [
     to: ".",
     icon: faHouse,
   },
+
   {
     id: 1,
-    label: "Quản lý loại",
-    to: "categories",
-    icon: faList,
-  },
-  {
-    id: 2,
     label: "Thêm sản phẩm",
     to: "products",
     icon: faPlus,
   },
   {
-    id: 3,
+    id: 2,
     label: "Quản lý giao dịch",
     to: "transactions",
     icon: faExchangeAlt,

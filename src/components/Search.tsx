@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { IProduct } from "../types";
-import { Products } from "../data/product";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleXmark,
   faSearch,
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
+import { getAllProducts } from "../services/productService";
 
 export default function Search() {
   const [search, setSearch] = useState("");
+  const [allProducts, setAllProducts] = useState<IProduct[]>([]);
   const [results, setResults] = useState<IProduct[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -19,12 +20,27 @@ export default function Search() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getAllProducts();
+        setAllProducts(data);
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (search.trim()) {
       setLoading(true);
       debounceRef.current = setTimeout(() => {
-        const filtered = Products.filter((item) =>
+        const filtered = allProducts.filter((item) =>
           item.name.toLowerCase().includes(search.toLowerCase())
         );
         setResults(filtered);

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import ProductCard from "../product/ProductCard";
-import { Products } from "../../data/product";
 import Pagination from "../product/Pagination";
 import { getAllProducts } from "../../services/productService";
 import { IProduct } from "../../types";
@@ -10,7 +9,7 @@ const Product = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
 
   const ITEMS_PER_PAGE = 12;
-  const totalPages = Math.ceil(Products.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -31,7 +30,7 @@ const Product = () => {
           <div className="flex justify-between mb-2 border-b pb-4">
             <div className="flex gap-4 items-center">
               <h2 className="text-base lg:text-2xl text-gray-700 font-bold">
-                Có <span className="underline">{Products.length}</span> sản phẩm
+                Có <span className="underline">{products.length}</span> sản phẩm
               </h2>
 
               <div className="flex border text-sm border-gray-700">

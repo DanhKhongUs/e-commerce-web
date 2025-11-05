@@ -3,9 +3,15 @@ export interface IProduct {
   name: string;
   imageUrl: string;
   price: number;
+  category: string;
   discount: number;
   product_date?: Date;
   description?: string;
+}
+
+export interface ICategory {
+  category_id: string;
+  category_name: string;
 }
 
 export interface IUser {
