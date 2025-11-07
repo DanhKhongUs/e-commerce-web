@@ -5,8 +5,8 @@ export interface IProduct {
   price: number;
   category: string;
   discount: number;
-  product_date?: Date;
-  description?: string;
+  product_date: Date;
+  description: string;
 }
 
 export interface ICategory {

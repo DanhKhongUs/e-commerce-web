@@ -19,7 +19,7 @@ export default function ProductDetail() {
       try {
         if (!id) return;
         const data = await getProductById(id);
-        setProduct(data);
+        setProduct(data.data);
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);
       }
@@ -49,7 +49,7 @@ export default function ProductDetail() {
   };
   return (
     <div className="flex flex-col md:flex-row gap-10">
-      <div className="relative max-h-[600px] max-w-[600px]">
+      <div className="relative max-h-[700px] max-w-[700px]">
         <img
           src={product.imageUrl}
           alt={product.name}
@@ -57,12 +57,12 @@ export default function ProductDetail() {
         />
       </div>
 
-      <div className="space-y-6">
+      <div className="md:space-y-10 space-y-6 md:mt-20 mt-2">
         <h1 className="text-2xl font-bold text-gray-700">{product.name}</h1>
 
         <p className="text-xl text-red-600 font-semibold">
           <span className="text-gray-600">Giá: </span>
-          {parseInt(product.price.toString()).toLocaleString()}đ
+          {product.price.toLocaleString("vi-VN")} VND
         </p>
         <p className=" text-gray-700">
           <span className="font-medium">Mô tả: </span>

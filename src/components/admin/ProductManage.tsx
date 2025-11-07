@@ -43,7 +43,7 @@ export default function ProductManager() {
       setProducts(
         res.data.map((p: IProduct) => ({
           ...p,
-          product_date: new Date(p.product_date as Date),
+          product_date: new Date(p.product_date),
         }))
       );
       setCurrentPage(page);
@@ -192,43 +192,42 @@ export default function ProductManager() {
             <th className="p-3">TÊN</th>
             <th className="p-3">GIÁ</th>
             <th className="p-3">DANH MỤC</th>
-            <th className="p-3">NGÀY TẠO</th>
             <th className="p-3 text-center">HÀNH ĐỘNG</th>
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
-            <tr key={p.id} className="border-b hover:bg-gray-50">
-              <td className="p-3">
-                <img
-                  src={p.imageUrl || "/default-product.jpg"}
-                  alt={p.name}
-                  className="w-16 h-16 object-cover rounded-md border"
-                />
-              </td>
-              <td className="p-3 font-medium">{p.name}</td>
-              <td className="p-3">{p.price.toLocaleString()} ₫</td>
-              <td className="p-3">
-                {categories.find((c) => c.category_id === p.category)
-                  ?.category_name || "Không có danh mục"}
-              </td>
-              <td className="p-3">
-                {new Date(p.product_date ?? "").toLocaleDateString("vi-VN")}
-              </td>
-              <td className="p-3 flex justify-center gap-4">
-                <FontAwesomeIcon
-                  icon={faEdit}
-                  className="text-blue-500 cursor-pointer"
-                  onClick={() => handleOpen(p)}
-                />
-                <FontAwesomeIcon
-                  icon={faTrash}
-                  className="text-red-500 cursor-pointer"
-                  onClick={() => handleDelete(p.id)}
-                />
-              </td>
-            </tr>
-          ))}
+          {products.map((p) => {
+            const categoryName =
+              categories?.find((c) => c.category_id === p.category)
+                ?.category_name || "Không có danh mục";
+            return (
+              <tr key={p.id} className="border-b hover:bg-gray-50">
+                <td className="p-3">
+                  <img
+                    src={p.imageUrl || "/default-product.jpg"}
+                    alt={p.name}
+                    className="w-16 h-16 object-cover rounded-md border"
+                  />
+                </td>
+                <td className="p-3 font-medium">{p.name}</td>
+                <td className="p-3">{p.price.toLocaleString()} ₫</td>
+                <td className="p-3">{categoryName}</td>
+
+                <td className="p-3 mt-6 flex justify-center items-center gap-4">
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    className="text-blue-500 cursor-pointer"
+                    onClick={() => handleOpen(p)}
+                  />
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="text-red-500 cursor-pointer"
+                    onClick={() => handleDelete(p.id)}
+                  />
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
@@ -237,7 +236,7 @@ export default function ProductManager() {
         open={isModalOpen}
         onCancel={handleClose}
         footer={null}
-        width={700}
+        width={800}
       >
         <div className="space-y-4 mt-4">
           <div>
@@ -256,16 +255,11 @@ export default function ProductManager() {
             <select
               name="category"
               value={newProduct.category}
-              onChange={(e) => {
-                setNewProduct((prev) => ({
-                  ...prev,
-                  category: e.target.value,
-                }));
-              }}
+              onChange={handleChange}
               className="w-full border rounded-md p-2"
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories.map((category) => (
+              {categories?.map((category) => (
                 <option key={category.category_id} value={category.category_id}>
                   {category.category_name}
                 </option>
