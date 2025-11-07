@@ -9,6 +9,7 @@ import express from "express";
 import { requireAdmin, verifyToken } from "middleware/auth";
 
 const router = express.Router();
+
 router.get("/", getAllProducts);
 router.get("/:id", getProductById);
 

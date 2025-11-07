@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { categoryCollection } from "models/category.model";
 import { productCollection } from "models/product.model";
 import { ObjectId } from "mongodb";
 
@@ -6,7 +7,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
   try {
     const col = await productCollection.getCollection();
 
-    const products = await col.find().sort({ createdAt: -1 }).toArray();
+    const products = await col.find().sort({ created_at: -1 }).toArray();
 
     const formattedProducts = products.map((product) => ({
       ...product,
@@ -48,22 +49,30 @@ export const getProductById = async (req: Request, res: Response) => {
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({ message: "Please login to continue" });
+    }
     const { name, price, discount, description, category, imageUrl } = req.body;
 
     if (!name || !price || !discount || !description || !imageUrl || !category)
       return res.status(400).json({ error: "Data are required" });
 
-    if (!ObjectId.isValid(category))
-      return res.status(400).json({ error: "Invalid category ID" });
+    if (!category || typeof category !== "string") {
+      return res.status(400).json({ error: "Invalid category id format" });
+    }
 
     const col = await productCollection.getCollection();
 
     const newProduct = {
       _id: new ObjectId(),
       name,
-      price,
-      discount,
-      category,
+      price: Number(price),
+      discount: Number(discount),
+      category: category
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w\-]+/g, ""),
       description,
       imageUrl: imageUrl || "",
       created_at: new Date(),
@@ -93,8 +102,11 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (!name || !price || !discount || !description || !imageUrl || !category)
       return res.status(400).json({ error: "Data are required" });
 
-    if (!ObjectId.isValid(id) || !ObjectId.isValid(category)) {
-      return res.status(400).json({ error: "Invalid ID" });
+    if (!ObjectId.isValid(category)) {
+      return res.status(400).json({ error: "Invalid category id" });
+    }
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid product ID" });
     }
 
     const col = await productCollection.getCollection();
@@ -106,10 +118,13 @@ export const updateProduct = async (req: Request, res: Response) => {
       {
         $set: {
           name,
-          price,
-          discount,
+          price: Number(price),
+          discount: Number(discount),
           description,
-          category,
+          category: category
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w\-]+/g, ""),
           imageUrl,
           updated_at: new Date(),
         },

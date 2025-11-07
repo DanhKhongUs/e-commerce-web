@@ -96,7 +96,7 @@ export const logoutUser = async (req: Request, res: Response) => {
   }
 };
 
-export const users = async (req: AuthRequest, res: Response) => {
+export const profile = async (req: AuthRequest, res: Response) => {
   try {
     const col = await userCollection.getCollection();
     const user = await col.findOne(
@@ -104,7 +104,9 @@ export const users = async (req: AuthRequest, res: Response) => {
       { projection: { password_hash: 0 } }
     );
     if (!user)
-      return res.status(404).json({ success: true, message: "USER_NOT_FOUND" });
+      return res
+        .status(404)
+        .json({ success: false, message: "USER_NOT_FOUND" });
 
     return res.json({ success: true, data: user });
   } catch (error) {

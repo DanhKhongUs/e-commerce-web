@@ -6,7 +6,8 @@ import { Database } from "lib/mongodb-wrapper";
 import usersRoutes from "./routes/users.route";
 import authRoutes from "./routes/auth.route";
 import productRoutes from "./routes/product.route";
-import adminRoutes from "./routes/admin.route";
+import categoryRoutes from "./routes/category.route";
+import cartRoutes from "./routes/cart.route";
 
 dotenv.config();
 const app: Application = express();
@@ -28,7 +29,8 @@ app.use(
 app.use("/api", usersRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/cart", cartRoutes);
 
 const db = Database.getInstance();
 db.connect()

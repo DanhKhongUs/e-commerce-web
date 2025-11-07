@@ -12,7 +12,13 @@ export const getAllCategories = async (req: Request, res: Response) => {
       .project({ created_at: 0 })
       .toArray();
 
-    res.json({ success: true, data: categories });
+    const formatted = categories.map((c) => ({
+      ...c,
+      id: c._id.toString(),
+      _id: undefined,
+    }));
+
+    res.json({ success: true, data: formatted });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -37,21 +43,16 @@ export const createCategory = async (req: Request, res: Response) => {
     if (exists)
       return res.status(400).json({ error: "CATEGORY_ALREADY_EXISTS" });
 
-    await col.updateOne(
-      {
-        category_id: format_category_id,
-      },
-      {
-        $setOnInsert: {
-          category_id: format_category_id,
-          category_name,
-          created_at: new Date(),
-        },
-      },
-      { upsert: true }
-    );
+    const newCat = {
+      _id: new ObjectId(),
+      category_id: format_category_id,
+      category_name,
+      created_at: new Date(),
+    };
 
-    res.json({ success: true });
+    await col.insertOne(newCat);
+
+    res.json({ success: true, data: { id: newCat._id.toString(), ...newCat } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -97,13 +98,13 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 export const deleteCategory = async (req: Request, res: Response) => {
   try {
-    const { category_id } = req.body;
-    if (!category_id)
+    const { id } = req.params;
+    if (!ObjectId.isValid(id))
       return res.status(400).json({ error: "Category ID is required" });
 
     const col = await categoryCollection.getCollection();
 
-    const result = await col.deleteOne({ category_id });
+    const result = await col.deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0)
       return res.status(404).json({ error: "Category not found" });
