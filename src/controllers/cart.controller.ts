@@ -6,14 +6,18 @@ import { productCollection } from "models/product.model";
 export const getCart = async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
+
     const cartCol = await cartCollection.getCollection();
 
     const cart = await cartCol.findOne({ userId });
     if (!cart) {
-      return res.json({ item: [], totalPrice: 0 });
+      return res.json({ success: true, data: { products: [], totalPrice: 0 } });
     }
 
-    return res.json(cart);
+    const { _id, ...cartData } = cart;
+
+    return res.json({ success: true, data: cartData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
@@ -23,6 +27,7 @@ export const getCart = async (req: Request, res: Response) => {
 export const addToCart = async (req: Request, res: Response) => {
   try {
     const { productId, quantity, userId } = req.body;
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
 
     if (!productId || !quantity) {
       return res.status(400).json({ error: "Missing productId or quantity" });
@@ -92,6 +97,7 @@ export const addToCart = async (req: Request, res: Response) => {
 export const updateCart = async (req: Request, res: Response) => {
   try {
     const { productId, userId, quantity } = req.body;
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
 
     const cartCol = await cartCollection.getCollection();
 
@@ -130,19 +136,21 @@ export const deleteCart = async (req: Request, res: Response) => {
   try {
     const { productId, userId } = req.body;
 
-    const cartCol = await cartCollection.getCollection();
+    if (!userId) return res.status(400).json({ error: "User ID is required" });
 
-    let cart = await cartCol.findOne(userId);
-    if (!cart) return res.status(400).json({ message: "Cart not found" });
+    const cartCol = await cartCollection.getCollection();
+    const cart = await cartCol.findOne({ userId });
+
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const index = cart.products.findIndex(
       (p: any) => p.productId === productId
     );
-
     if (index < 0)
       return res.status(404).json({ message: "Product not found in cart" });
 
     cart.products.splice(index, 1);
+
     cart.totalPrice = cart.products.reduce(
       (sum: number, p: any) => sum + p.price * p.quantity,
       0
@@ -152,49 +160,6 @@ export const deleteCart = async (req: Request, res: Response) => {
     await cartCol.updateOne({ userId }, { $set: cart });
 
     return res.json(cart);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
-  }
-};
-
-export const mergeCart = async (req: Request, res: Response) => {
-  try {
-    const { guestId, userId } = req.body;
-    const cartCol = await cartCollection.getCollection();
-
-    const guestCart = await cartCol.findOne({ userId: guestId });
-    const userCart = await cartCol.findOne({ userId });
-
-    if (!guestCart)
-      return res.status(404).json({ message: "Guest cart not found" });
-
-    if (userCart) {
-      guestCart.products.forEach((guestItem: any) => {
-        const index = userCart.products.findIndex(
-          (item: any) => item.productId === guestItem.productId
-        );
-        if (index >= 0) {
-          userCart.products[index].quantity += guestItem.quantity;
-        } else {
-          userCart.products.push(guestItem);
-        }
-      });
-
-      userCart.totalPrice = userCart.products.reduce(
-        (sum: number, p: any) => sum + p.price * p.quantity,
-        0
-      );
-
-      await cartCol.updateOne({ userId }, { $set: userCart });
-      await cartCol.deleteOne({ userId: guestId });
-
-      res.json(userCart);
-    } else {
-      guestCart.userId = userId;
-      await cartCol.updateOne({ _id: guestCart._id }, { $set: guestCart });
-      res.json(guestCart);
-    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
