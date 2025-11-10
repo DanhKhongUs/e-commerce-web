@@ -1,25 +1,39 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useCart } from "../../context/ProductContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { IProduct } from "../../types";
 import { getProductById } from "../../services/productService";
+import { addToCart } from "../../services/cartService";
+import { checkAuth } from "../../services/authService";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
+  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { addToCart } = useCart();
 
   const [product, setProduct] = useState<IProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const res = await checkAuth();
+        setUserId(res.data._id);
+      } catch (error) {
+        console.error(error);
+        setUserId(null);
+      }
+    };
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         if (!id) return;
-        const data = await getProductById(id);
-        setProduct(data.data);
+        const res = await getProductById(id);
+        setProduct(res.data);
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);
       }
@@ -27,10 +41,31 @@ export default function ProductDetail() {
 
     fetchProduct();
   }, [id]);
+
   if (!product) {
     return (
-      <div className="text-center py-10 text-gray-700 font-semibold max-w-screen-xl mx-auto bg-[#fdfbf5]">
-        Đang tải sản phẩm...
+      <div className="flex justify-center items-center py-20 text-gray-600">
+        <svg
+          className="animate-spin h-8 w-8 mr-3 text-pink-600"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8H4z"
+          ></path>
+        </svg>
+        <span>Đang tải giỏ hàng...</span>
       </div>
     );
   }
@@ -38,14 +73,41 @@ export default function ProductDetail() {
   const increaseQuantity = () => setQuantity((q) => q + 1);
   const decreaseQuantity = () => setQuantity((q) => (q > 1 ? q - 1 : 1));
 
-  const handleAddToCart = () => {
-    addToCart(product, quantity);
-    alert("Thêm vào giỏ hàng thành công!");
+  const handleAddToCart = async () => {
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+
+    try {
+      await addToCart({
+        userId,
+        productId: product.id,
+        quantity,
+      });
+
+      alert("Đã thêm vào giỏ hàng");
+    } catch (error: any) {
+      console.error("Lỗi thêm giỏ hàng:", error.response?.data || error);
+    }
   };
 
-  const handleBuyNow = () => {
-    addToCart(product, quantity);
-    navigate("/cart");
+  const handleBuyNow = async () => {
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+
+    try {
+      await addToCart({
+        userId,
+        productId: product.id,
+        quantity,
+      });
+      navigate(`/cart?userId=${userId}`);
+    } catch (error: any) {
+      console.error("Lỗi thêm giỏ hàng:", error.response?.data || error);
+    }
   };
   return (
     <div className="flex flex-col md:flex-row gap-10">

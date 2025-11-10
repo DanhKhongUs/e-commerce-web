@@ -14,6 +14,23 @@ export interface ICategory {
   category_name: string;
 }
 
+interface ICartProduct {
+  productId: string;
+  name: string;
+  imageUrl: string;
+  price: number;
+  quantity: number;
+}
+
+export interface ICart {
+  _id?: string;
+  userId: string;
+  products: ICartProduct[];
+  productId: string;
+  quantity: number;
+  totalPrice?: number;
+}
+
 export interface IUser {
   id: string;
   name: string;

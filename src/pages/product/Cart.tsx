@@ -1,14 +1,154 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
-import { useCart } from "../../context/ProductContext";
+import { useEffect, useState } from "react";
+import { getCart, deleteCart, updateCart } from "../../services/cartService";
+import { ICart } from "../../types";
+import { checkAuth } from "../../services/authService";
 
 const Cart = () => {
-  const { cart, removeFromCart } = useCart();
+  const [cart, setCart] = useState<ICart | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (cart.length === 0) {
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const res = await checkAuth();
+        setUserId(res.data._id);
+      } catch (error) {
+        console.error(error);
+        setUserId(null);
+      }
+    };
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+    const fetchCart = async () => {
+      try {
+        setLoading(true);
+        const res = await getCart(userId);
+        setCart(res.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCart();
+  }, [userId]);
+
+  const removeFromCart = async (productId: string) => {
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+    try {
+      await deleteCart(userId, productId);
+      setCart((prev: any) => ({
+        ...prev,
+        products: prev.products.filter((p: any) => p.productId !== productId),
+        totalPrice: prev.products
+          .filter((p: any) => p.productId !== productId)
+          .reduce((sum: number, p: any) => sum + p.price * p.quantity, 0),
+      }));
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
+
+  const increaseQuantity = async (productId: string, quantity: number) => {
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+    try {
+      await updateCart(userId, productId, quantity + 1);
+      setCart((prev) => {
+        if (!prev) return prev;
+        const updateProducts = prev.products.map((item) =>
+          item.productId === productId
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+        const updateTotalPrice = updateProducts.reduce(
+          (acc, product) => acc + product.price * product.quantity,
+          0
+        );
+        return {
+          ...prev,
+          products: updateProducts,
+          totalPrice: updateTotalPrice,
+        };
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const decreaseQuantity = async (productId: string, quantity: number) => {
+    if (quantity <= 1) return;
+    if (!userId) {
+      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      return;
+    }
+    try {
+      await updateCart(userId, productId, quantity - 1);
+      setCart((prev) => {
+        if (!prev) return prev;
+        const updateProducts = prev.products.map((item) =>
+          item.productId === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        );
+        const updateTotalPrice = updateProducts.reduce(
+          (acc, product) => acc + product.price * product.quantity,
+          0
+        );
+        return {
+          ...prev,
+          products: updateProducts,
+          totalPrice: updateTotalPrice,
+        };
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="text-center  py-10 px-4 sm:px-6 lg:px-8 text-[#4a4a4a] max-w-screen-xl mx-auto">
+      <div className="flex justify-center items-center py-20 text-gray-600">
+        <svg
+          className="animate-spin h-8 w-8 mr-3 text-pink-600"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8H4z"
+          ></path>
+        </svg>
+        <span>Đang tải giỏ hàng...</span>
+      </div>
+    );
+  }
+
+  if (!cart || cart.products.length === 0) {
+    return (
+      <div className="text-center py-10 px-4 sm:px-6 lg:px-8 text-[#4a4a4a] max-w-screen-xl mx-auto">
         <h2 className="text-2xl font-semibold mb-8">
           Chưa có sản phẩm nào trong giỏ hàng.
         </h2>
@@ -22,81 +162,83 @@ const Cart = () => {
     );
   }
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const total = cart.totalPrice || 0;
 
   return (
     <div className="bg-white shadow-md rounded-md mt-10 px-4 sm:px-6 lg:px-8 py-10 text-[#4a4a4a] max-w-screen-xl mx-auto">
       <div className="grid md:grid-cols-3 gap-10">
-        {/* Sản phẩm */}
         <div className="md:col-span-2 bg-white border border-gray-500 p-6 rounded">
           <h2 className="font-bold text-lg mb-4">
             SẢN PHẨM
             <hr className="w-8 border border-[#c0b49f]" />
           </h2>
+
           <div>
             <div className="hidden sm:grid grid-cols-6 font-bold text-sm uppercase text-[#4a4a4a] border-b py-2">
-              <div className="col-span-1 text-center"></div>
               <div className="col-span-2">Sản phẩm</div>
               <div className="col-span-1 text-center">Giá</div>
               <div className="col-span-1 text-center">Số lượng</div>
               <div className="col-span-1 text-right pr-2">Tạm tính</div>
             </div>
 
-            {cart.map(({ product, quantity }) => (
+            {cart.products.map((item: any) => (
               <div
-                key={product.id}
+                key={item.productId}
                 className="grid grid-cols-1 sm:grid-cols-6 items-start sm:items-center py-4 border-b text-[#4a4a4a] gap-4"
               >
                 <div className="sm:col-span-2 flex items-start gap-4">
                   <img
-                    src={product.imageUrl}
-                    alt={product.name}
+                    src={item.imageUrl}
+                    alt={item.name}
                     className="w-20 h-16 object-cover"
                   />
                   <div className="flex-1">
                     <span className="font-semibold uppercase text-sm">
-                      {product.name}
+                      {item.name}
                     </span>
-
-                    <div className="sm:hidden mt-2 text-sm space-y-1">
-                      <p>Giá: {product.price.toLocaleString()}₫</p>
-                      <p>Số lượng: {quantity}</p>
-                      <p className="font-semibold">
-                        Tạm tính: {(product.price * quantity).toLocaleString()}₫
-                      </p>
-
-                      <button
-                        onClick={() => removeFromCart(product.id)}
-                        className="mt-2 text-gray-600 text-sm flex items-center gap-1"
-                      >
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                    </div>
                   </div>
+                </div>
+
+                <div className="hidden sm:block text-center font-medium">
+                  {item.price.toLocaleString()}₫
+                </div>
+
+                <div className="hidden sm:flex justify-center">
+                  <label className="font-medium">Số lượng:</label>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <button
+                      onClick={() =>
+                        decreaseQuantity(item.productId, item.quantity)
+                      }
+                      className="border px-3 py-1 rounded bg-white hover:bg-gray-100 cursor-pointer"
+                    >
+                      -
+                    </button>
+                    <span className="min-w-[24px] text-center">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        increaseQuantity(item.productId, item.quantity)
+                      }
+                      className="border px-3 py-1 rounded bg-white hover:bg-gray-100 cursor-pointer"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div className="hidden sm:block text-right font-medium">
+                  {(item.price * item.quantity).toLocaleString()}₫
                 </div>
 
                 <div className="hidden sm:flex justify-center">
                   <button
-                    onClick={() => removeFromCart(product.id)}
+                    onClick={() => removeFromCart(item.productId)}
                     className="text-gray-500 hover:text-gray-600 text-xl"
                   >
                     <FontAwesomeIcon icon={faTrash} />
                   </button>
-                </div>
-                <div className="hidden sm:block text-center font-medium">
-                  {product.price.toLocaleString()}₫
-                </div>
-
-                <div className="hidden sm:flex justify-center">
-                  <div className="flex border border-gray-300 rounded text-base">
-                    <span className="px-3">{quantity}</span>
-                  </div>
-                </div>
-                <div className="hidden sm:block text-right font-medium">
-                  {(product.price * quantity).toLocaleString()}₫
                 </div>
               </div>
             ))}
@@ -112,7 +254,7 @@ const Cart = () => {
           </div>
         </div>
 
-        {/* Cộng giỏ hàng */}
+        {/* Tổng giỏ hàng */}
         <div className="bg-white border border-gray-500 p-6 rounded">
           <h3 className="font-bold text-lg mb-4">CỘNG GIỎ HÀNG</h3>
           <div className="space-y-2">
@@ -132,20 +274,6 @@ const Cart = () => {
           >
             TIẾN HÀNH THANH TOÁN
           </Link>
-
-          <div className="mt-6">
-            <p className="flex items-center text-[#c30069] font-semibold mb-2">
-              <span className="mr-2">🏷️</span> Phiếu ưu đãi
-            </p>
-            <input
-              type="text"
-              placeholder="Mã ưu đãi"
-              className="w-full border border-gray-300 px-3 py-2 rounded mb-2"
-            />
-            <button className="w-full bg-[#c30069] text-white py-2 rounded hover:bg-[#a10056] transition">
-              Áp dụng
-            </button>
-          </div>
         </div>
       </div>
     </div>
