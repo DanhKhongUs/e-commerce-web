@@ -10,8 +10,8 @@ import { verifyToken } from "middleware/auth";
 const router = express.Router();
 
 router.get("/", verifyToken, getCart);
-router.post("/", verifyToken, addToCart);
-router.put("/", verifyToken, updateCart);
-router.delete("/", verifyToken, deleteCart);
+router.post("/add", verifyToken, addToCart);
+router.put("/update", verifyToken, updateCart);
+router.delete("/delete", verifyToken, deleteCart);
 
 export default router;

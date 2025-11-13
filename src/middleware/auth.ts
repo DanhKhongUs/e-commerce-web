@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 dotenv.config();
 
 export interface AuthRequest extends Request {
-  user?: { email: string; role: "user" | "admin" };
+  user?: { _id: ObjectId; email: string; role: "user" | "admin" };
 }
 
 export const verifyToken = (
@@ -22,8 +23,13 @@ export const verifyToken = (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
       email: string;
       role: "user" | "admin";
+      _id: ObjectId;
     };
-    req.user = decoded;
+    req.user = {
+      _id: new ObjectId(decoded._id),
+      email: decoded.email,
+      role: decoded.role,
+    };
     next();
   } catch (error) {
     return res.status(403).json({ error: "INVALID_TOKEN" });

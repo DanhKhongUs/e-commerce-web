@@ -48,10 +48,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const col = await userCollection.getCollection();
 
-    const user = await col.findOne(
-      { email },
-      { projection: { password_hash: 1 } }
-    );
+    const user = await col.findOne({ email });
 
     if (!user) return res.status(404).json({ error: "ACCOUNT_NOT_FOUND" });
 
@@ -64,7 +61,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "WRONG_PASSWORD" });
 
     const token = jwt.sign(
-      { email, role: user.role || "user" },
+      { _id: user._id.toString(), email, role: user.role || "user" },
       process.env.JWT_SECRET!,
       {
         expiresIn: "7d",
@@ -79,7 +76,7 @@ export const loginUser = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    return res.json({ success: true });
+    return res.json({ success: true, data: { user, token } });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });

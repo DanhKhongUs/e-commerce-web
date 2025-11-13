@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { ObjectId } from "mongodb";
 import { cartCollection } from "models/cart.model";
 import { productCollection } from "models/product.model";
+import { AuthRequest } from "middleware/auth";
 
-export const getCart = async (req: Request, res: Response) => {
+export const getCart = async (req: AuthRequest, res: Response) => {
   try {
-    const { userId } = req.query;
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    const userId = req.user?._id;
+    if (!userId) return res.status(400).json({ error: "UNAUTHORIZED" });
 
     const cartCol = await cartCollection.getCollection();
 
@@ -24,11 +25,12 @@ export const getCart = async (req: Request, res: Response) => {
   }
 };
 
-export const addToCart = async (req: Request, res: Response) => {
+export const addToCart = async (req: AuthRequest, res: Response) => {
   try {
-    const { productId, quantity, userId } = req.body;
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    const userId = req.user?._id;
+    if (!userId) return res.status(400).json({ error: "UNAUTHORIZED" });
 
+    const { productId, quantity } = req.body;
     if (!productId || !quantity) {
       return res.status(400).json({ error: "Missing productId or quantity" });
     }
@@ -94,10 +96,12 @@ export const addToCart = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCart = async (req: Request, res: Response) => {
+export const updateCart = async (req: AuthRequest, res: Response) => {
   try {
-    const { productId, userId, quantity } = req.body;
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    const userId = req.user?._id;
+    if (!userId) return res.status(400).json({ error: "UNAUTHORIZED" });
+
+    const { productId, quantity } = req.body;
 
     const cartCol = await cartCollection.getCollection();
 
@@ -132,11 +136,13 @@ export const updateCart = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteCart = async (req: Request, res: Response) => {
+export const deleteCart = async (req: AuthRequest, res: Response) => {
   try {
-    const { productId, userId } = req.body;
+    const userId = req.user?._id;
 
-    if (!userId) return res.status(400).json({ error: "User ID is required" });
+    if (!userId) return res.status(400).json({ error: "UNAUTHORIZED" });
+
+    const { productId } = req.body;
 
     const cartCol = await cartCollection.getCollection();
     const cart = await cartCol.findOne({ userId });
