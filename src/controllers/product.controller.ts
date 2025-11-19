@@ -53,9 +53,9 @@ export const createProduct = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(401).json({ message: "Please login to continue" });
     }
-    const { name, price, discount, description, category, imageUrl } = req.body;
+    const { name, price, description, category, imageUrl } = req.body;
 
-    if (!name || !price || !discount || !description || !imageUrl || !category)
+    if (!name || !price || !description || !imageUrl || !category)
       return res.status(400).json({ error: "Data are required" });
 
     if (!category || typeof category !== "string") {
@@ -68,7 +68,6 @@ export const createProduct = async (req: Request, res: Response) => {
       _id: new ObjectId(),
       name,
       price: Number(price),
-      discount: Number(discount),
       category: category
         .toLowerCase()
         .replace(/\s+/g, "-")
@@ -97,9 +96,9 @@ export const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const { name, price, discount, category, description, imageUrl } = req.body;
+    const { name, price, category, description, imageUrl } = req.body;
 
-    if (!name || !price || !discount || !description || !imageUrl || !category)
+    if (!name || !price || !description || !imageUrl || !category)
       return res.status(400).json({ error: "Data are required" });
 
     if (!ObjectId.isValid(category)) {
@@ -119,7 +118,6 @@ export const updateProduct = async (req: Request, res: Response) => {
         $set: {
           name,
           price: Number(price),
-          discount: Number(discount),
           description,
           category: category
             .toLowerCase()
