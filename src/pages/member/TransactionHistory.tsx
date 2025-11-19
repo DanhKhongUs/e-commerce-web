@@ -106,7 +106,7 @@ export default function TransactionHistory() {
 
               <div className="text-right flex flex-col items-end">
                 <p className="font-semibold text-lg text-gray-800">
-                  {tx.total.toLocaleString("vi-VN")}₫
+                  {tx.total.toLocaleString("vi-VN")} VND
                 </p>
                 <div
                   className={`inline-flex items-center px-2 py-1 text-sm font-medium rounded-full mt-1 ${status.color}`}

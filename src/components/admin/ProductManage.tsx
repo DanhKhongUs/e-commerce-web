@@ -27,7 +27,6 @@ export default function ProductManager() {
     imageUrl: "",
     category: "",
     price: 0,
-    discount: 0,
     description: "",
     product_date: new Date(),
   });
@@ -89,7 +88,6 @@ export default function ProductManager() {
         price: 0,
         description: "",
         category: "",
-        discount: 0,
         imageUrl: "",
         product_date: new Date(),
       });
@@ -105,7 +103,6 @@ export default function ProductManager() {
       name: "",
       price: 0,
       description: "",
-      discount: 0,
       category: "",
       imageUrl: "",
       product_date: new Date(),
@@ -210,7 +207,7 @@ export default function ProductManager() {
                   />
                 </td>
                 <td className="p-3 font-medium">{p.name}</td>
-                <td className="p-3">{p.price.toLocaleString()} ₫</td>
+                <td className="p-3">{p.price.toLocaleString()} VND</td>
                 <td className="p-3">{categoryName}</td>
 
                 <td className="p-3 mt-6 flex justify-center items-center gap-4">
@@ -295,18 +292,6 @@ export default function ProductManager() {
                 value={newProduct.price}
                 onChange={handleChange}
                 placeholder="Nhập giá..."
-                className="w-full border rounded-md p-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-600 mb-1">Giảm giá (%):</label>
-              <input
-                name="discount"
-                type="number"
-                value={newProduct.discount}
-                onChange={handleChange}
-                placeholder="Nhập giảm giá..."
                 className="w-full border rounded-md p-2"
               />
             </div>

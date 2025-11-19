@@ -50,7 +50,6 @@ export default function LoginPage() {
 
       <button
         type="submit"
-        onClick={handleLogin}
         className="w-full py-2 bg-gray-800 text-white font-semibold rounded hover:bg-gray-700 transition duration-300 cursor-pointer"
       >
         {isLoading ? "Đang xử lý..." : "Đăng nhập"}

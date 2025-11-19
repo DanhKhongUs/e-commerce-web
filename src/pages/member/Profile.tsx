@@ -1,7 +1,26 @@
+import { useEffect, useState } from "react";
 import { useUserProfile } from "../../hooks/useUserProfile";
+import { checkAuth } from "../../services/authService";
 
 export default function Profile() {
   const { formData, setFormData, saveProfile } = useUserProfile();
+  const [user, setUser] = useState({
+    name: "",
+  });
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await checkAuth();
+        setUser({
+          name: res.data.name,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -28,9 +47,8 @@ export default function Profile() {
             </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
+              value={user.name}
+              readOnly
               className="w-full border border-gray-300 rounded-md p-3 focus:ring focus:ring-gray-200 outline-none"
             />
           </div>

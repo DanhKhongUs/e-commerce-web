@@ -69,9 +69,8 @@ export const useAuthProvider = () => {
         toast.error(data.message || "Signup failed.");
         return { success: false, message: data.message || "Signup failed." };
       }
-
       toast.success("SignUp successful. Please signin");
-      window.location.href = "/";
+      window.location.href = "/login";
       return { success: true };
     } catch (error) {
       console.error("SignUp error:", error);

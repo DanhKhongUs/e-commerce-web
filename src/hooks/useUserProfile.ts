@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { IUser } from "../types";
+import { checkAuth } from "../services/authService";
 
 export interface UserProfile {
-  name: string;
   phone: string;
   gender: string;
   birth: string;
@@ -10,61 +10,85 @@ export interface UserProfile {
 
 export function useUserProfile() {
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
+
   const [formData, setFormData] = useState<UserProfile>({
-    name: "",
     phone: "",
     gender: "",
     birth: "",
   });
+
   const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem("currentUser");
-      const savedProfile = localStorage.getItem("userProfile");
-      const savedAvatar = localStorage.getItem("userAvatar");
-
-      if (savedUser) setCurrentUser(JSON.parse(savedUser));
-      if (savedProfile) setFormData(JSON.parse(savedProfile));
-      if (savedAvatar) {
-        if (savedAvatar.startsWith("data:image")) {
-          setAvatar(savedAvatar);
-        } else {
-          setAvatar(JSON.parse(savedAvatar));
+    const loadProfile = async () => {
+      try {
+        const user = await checkAuth();
+        if (user) {
+          setCurrentUser(user);
         }
+
+        let savedProfile: UserProfile | null = null;
+        let savedAvatar: string | null = null;
+
+        try {
+          const profileLS = localStorage.getItem("userProfile");
+          savedProfile = profileLS ? JSON.parse(profileLS) : null;
+        } catch {
+          savedProfile = null;
+        }
+
+        const avatarLS = localStorage.getItem("userAvatar");
+        if (avatarLS && avatarLS.startsWith("data:image")) {
+          savedAvatar = avatarLS;
+        } else {
+          savedAvatar = null;
+        }
+
+        setFormData({
+          phone: savedProfile?.phone || "",
+          gender: savedProfile?.gender || "",
+          birth: savedProfile?.birth || "",
+        });
+
+        setAvatar(savedAvatar);
+      } catch (error) {
+        console.error("Lỗi load profile:", error);
       }
-    } catch (error) {
-      console.error("Lỗi khi đọc dữ liệu localStorage:", error);
-    }
+    };
+
+    loadProfile();
   }, []);
 
   const saveProfile = () => {
-    if (currentUser)
-      localStorage.setItem("currentUser", JSON.stringify(currentUser));
-    localStorage.setItem("userProfile", JSON.stringify(formData));
+    const dataToSave: UserProfile = {
+      phone: formData.phone,
+      gender: formData.gender,
+      birth: formData.birth,
+    };
+
+    localStorage.setItem("userProfile", JSON.stringify(dataToSave));
   };
 
   const clearProfile = () => {
-    localStorage.removeItem("currentUser");
     localStorage.removeItem("userProfile");
-    setCurrentUser(null);
+    localStorage.removeItem("userAvatar");
+
     setFormData({
-      name: "",
       phone: "",
       gender: "",
       birth: "",
     });
+
     setAvatar(null);
   };
 
   return {
     currentUser,
-    setCurrentUser,
     formData,
     setFormData,
-    saveProfile,
     avatar,
     setAvatar,
+    saveProfile,
     clearProfile,
   };
 }

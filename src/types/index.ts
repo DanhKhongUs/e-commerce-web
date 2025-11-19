@@ -4,7 +4,6 @@ export interface IProduct {
   imageUrl: string;
   price: number;
   category: string;
-  discount: number;
   product_date: Date;
   description: string;
 }
@@ -26,8 +25,6 @@ export interface ICart {
   _id?: string;
   userId: string;
   products: ICartProduct[];
-  productId: string;
-  quantity: number;
   totalPrice?: number;
 }
 

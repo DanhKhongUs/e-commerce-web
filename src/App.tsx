@@ -19,6 +19,9 @@ import DashBoard from "./pages/admin/DashBoard";
 import Transactions from "./pages/admin/Transactions";
 import Home from "./pages/home/Home";
 import AddProductPage from "./pages/admin/AddProduct";
+import OrderSuccess from "./pages/product/CheckoutSuccess";
+import CheckoutSuccess from "./pages/product/CheckoutSuccess";
+import CheckoutFailure from "./pages/product/CheckoutFailure";
 
 function AppContent() {
   const location = useLocation();
@@ -26,7 +29,8 @@ function AppContent() {
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
   const isAdminPage = location.pathname.startsWith("/admin");
 
-  const hideFooterRegex = /^\/($|products\/\d+|cart|checkout|blogs)$/; // match /products/123, / (home)
+  const hideFooterRegex =
+    /^\/($|products\/\d+|cart|checkout|checkout-success|checkout-failure|blogs)$/; // match /products/123, / (home)
   const shouldShowFooter =
     !hideFooterRegex.test(location.pathname) && !isAdminPage && !isAuthPage;
 
@@ -40,6 +44,9 @@ function AppContent() {
         <Route path="/products/:id" element={<ProductDetailPage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout-success" element={<CheckoutSuccess />} />
+        <Route path="/checkout-failure" element={<CheckoutFailure />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
         <Route path="/account" element={<MemberLayout />}>
           <Route index element={<Profile />} />
           <Route path="transactionHistory" element={<TransactionHistory />} />

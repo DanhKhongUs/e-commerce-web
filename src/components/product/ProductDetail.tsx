@@ -4,29 +4,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { IProduct } from "../../types";
 import { getProductById } from "../../services/productService";
-import { addToCart } from "../../services/cartService";
-import { checkAuth } from "../../services/authService";
+import { useCart } from "../../context/CartContext";
+import { toast } from "react-toastify";
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<IProduct | null>(null);
   const [quantity, setQuantity] = useState(1);
 
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const res = await checkAuth();
-        setUserId(res.data._id);
-      } catch (error) {
-        console.error(error);
-        setUserId(null);
-      }
-    };
-    fetchUserId();
-  }, []);
+  const { addCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -70,45 +58,26 @@ export default function ProductDetail() {
     );
   }
 
-  const increaseQuantity = () => setQuantity((q) => q + 1);
-  const decreaseQuantity = () => setQuantity((q) => (q > 1 ? q - 1 : 1));
-
   const handleAddToCart = async () => {
-    if (!userId) {
-      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
-      return;
-    }
-
     try {
-      await addToCart({
-        userId,
-        productId: product.id,
-        quantity,
-      });
-
-      alert("Đã thêm vào giỏ hàng");
-    } catch (error: any) {
-      console.error("Lỗi thêm giỏ hàng:", error.response?.data || error);
+      await addCart(product.id, quantity);
+      toast.success("Đã thêm vào giỏ hàng");
+    } catch (error) {
+      console.error(error);
+      toast.error("Đã có lỗi xảy ra khi thêm vào giỏ hàng");
     }
   };
 
   const handleBuyNow = async () => {
-    if (!userId) {
-      alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
-      return;
-    }
-
     try {
-      await addToCart({
-        userId,
-        productId: product.id,
-        quantity,
-      });
-      navigate(`/cart?userId=${userId}`);
-    } catch (error: any) {
-      console.error("Lỗi thêm giỏ hàng:", error.response?.data || error);
+      await addCart(product.id, quantity);
+      navigate("/cart");
+    } catch (error) {
+      console.error(error);
+      toast.error("Đã có lỗi xảy ra khi mua sản phẩm");
     }
   };
+
   return (
     <div className="flex flex-col md:flex-row gap-10">
       <div className="relative max-h-[700px] max-w-[700px]">
@@ -135,14 +104,14 @@ export default function ProductDetail() {
           <label className="font-medium">Số lượng:</label>
           <div className="flex items-center space-x-2 mt-2">
             <button
-              onClick={decreaseQuantity}
+              onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
               className="border px-3 py-1 rounded bg-white hover:bg-gray-100 cursor-pointer"
             >
               -
             </button>
             <span className="min-w-[24px] text-center">{quantity}</span>
             <button
-              onClick={increaseQuantity}
+              onClick={() => setQuantity((prev) => prev + 1)}
               className="border px-3 py-1 rounded bg-white hover:bg-gray-100 cursor-pointer"
             >
               +

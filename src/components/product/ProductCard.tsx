@@ -21,12 +21,6 @@ export default function ProductCard({ product }: Props) {
           alt={product.name}
           className="w-full h-52 object-cover"
         />
-
-        {product.discount > 0 && (
-          <div className="absolute top-2 right-2 bg-yellow-400 text-gray-900 text-xs font-bold px-2 py-2 rounded-md">
-            {product.discount}% GIẢM
-          </div>
-        )}
       </div>
 
       <div className="p-3 space-y-4">

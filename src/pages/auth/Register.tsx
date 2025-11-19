@@ -85,7 +85,6 @@ export default function RegisterPage() {
 
       <button
         type="submit"
-        onClick={handleRegister}
         className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 cursor-pointer"
       >
         {isLoading ? "Đang xử lý..." : "Đăng ký"}

@@ -9,21 +9,24 @@ import {
 import { useEffect, useState } from "react";
 import Search from "../Search";
 import * as Popover from "@radix-ui/react-popover";
-import { useCart } from "../../context/ProductContext";
 import { useAuth } from "../../context/auth/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { useUserProfile } from "../../hooks/useUserProfile";
 
 export default function Header() {
   const { isAuthenticated, user, actions, isLoading } = useAuth();
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const { cart, removeFromCart } = useCart();
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const { avatar } = useUserProfile();
+
+  const total = cart
+    ? cart?.products.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    : 0;
 
   useEffect(() => {
     const handleResize = () => {
@@ -67,13 +70,13 @@ export default function Header() {
             <Search />
           </div>
           <div className="flex gap-2 lg:gap-8">
-            <Popover.Root>
+            <Popover.Root open={isCartOpen} onOpenChange={setIsCartOpen}>
               <Popover.Trigger asChild>
                 <button className="relative">
                   <FontAwesomeIcon icon={faCartShopping} size="xl" />
-                  {cart.length > 0 && (
+                  {cart?.products && cart?.products.length > 0 && (
                     <span className="absolute -top-2 right-[-8px] bg-pink-700 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white">
-                      {cart.length}
+                      {cart?.products.length}
                     </span>
                   )}
                 </button>
@@ -83,32 +86,32 @@ export default function Header() {
                 sideOffset={8}
                 className="bg-white rounded-lg shadow-xl border w-80 lg:w-[400px] p-5 z-50"
               >
-                {cart.length > 0 ? (
+                {cart?.products.length ? (
                   <>
                     <div className="max-h-80 overflow-y-auto space-y-4">
-                      {cart.map((item) => (
-                        <div key={item.product.id}>
+                      {cart?.products.map((item) => (
+                        <div key={item.productId}>
                           <div className="flex items-start gap-4 border-b pb-4">
-                            <Link to={`cart/${item.product.id}`}>
+                            <Link to={`cart/${item.productId}`}>
                               <img
-                                src={item.product.imageUrl}
-                                alt={item.product.name}
+                                src={item.imageUrl}
+                                alt={item.name}
                                 className="w-16 h-16 object-cover rounded-lg"
                               />
                             </Link>
                             <div className="flex-1 space-y-1">
-                              <Link to={`cart/${item.product.id}`}>
+                              <Link to={`products/${item.productId}`}>
                                 <h4 className="font-semibold text-gray-700 hover:text-gray-900">
-                                  {item.product.name}
+                                  {item.name}
                                 </h4>
                                 <p className="text-gray-500">
                                   {item.quantity} ×{" "}
-                                  {item.product.price.toLocaleString()}₫
+                                  {item.price.toLocaleString()} VND
                                 </p>
                               </Link>
                             </div>
                             <button
-                              onClick={() => removeFromCart(item.product.id)}
+                              onClick={() => removeFromCart(item.productId)}
                               className="text-gray-400 hover:text-gray-500"
                             >
                               <FontAwesomeIcon icon={faTrash} />
@@ -121,17 +124,17 @@ export default function Header() {
                     <div className="flex justify-between border-t pt-4 font-semibold">
                       <span>Tổng cộng:</span>
                       <span className="text-black">
-                        {total.toLocaleString()}₫
+                        {total.toLocaleString()} VND
                       </span>
                     </div>
 
                     <div className="mt-4 flex flex-col gap-2">
-                      <Link to="cart">
+                      <Link to="cart" onClick={() => setIsCartOpen(false)}>
                         <button className="w-full bg-[#ff57221a] border-[#ee4d2d] border text-[#ee4d2d] py-2 font-semibold hover:bg-[#ffad941a] rounded">
                           XEM GIỎ HÀNG
                         </button>
                       </Link>
-                      <Link to="checkOut">
+                      <Link to="checkOut" onClick={() => setIsCartOpen(false)}>
                         <button className="w-full text-white py-2 font-semibold bg-[#ee4d2d] hover:opacity-90 rounded">
                           THANH TOÁN
                         </button>
@@ -156,21 +159,21 @@ export default function Header() {
                     onClick={() => isDesktop && setIsOpen(true)}
                     className="w-12 h-12 rounded-full overflow-hidden border border-gray-300 shadow-sm hover:shadow-md transition cursor-pointer"
                   >
-                    {/* {avatar ? (
+                    {avatar ? (
                       <img
                         src={avatar}
                         alt="Avatar"
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                    )} */}
-                    <svg
-                      className="w-12 h-12 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2c-3.2 0-9.5 1.6-9.5 4.9V22h19v-3.1c0-3.3-6.3-4.9-9.5-4.9z" />
-                    </svg>
+                      <svg
+                        className="w-12 h-12 text-gray-400"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2c-3.2 0-9.5 1.6-9.5 4.9V22h19v-3.1c0-3.3-6.3-4.9-9.5-4.9z" />
+                      </svg>
+                    )}
                   </div>
                 </Popover.Trigger>
 

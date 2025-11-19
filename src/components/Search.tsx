@@ -24,7 +24,7 @@ export default function Search() {
       try {
         setLoading(true);
         const data = await getAllProducts();
-        setAllProducts(data);
+        setAllProducts(data.data);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm:", error);
       } finally {
@@ -103,10 +103,12 @@ export default function Search() {
         )}
 
         {loading && (
-          <FontAwesomeIcon
-            icon={faSpinner}
-            className="absolute right-16 top-1/2 -translate-y-1/2 text-gray-400 animate-spin"
-          />
+          <div className="absolute right-16 top-1/2 -translate-y-1/2">
+            <FontAwesomeIcon
+              icon={faSpinner}
+              className="text-gray-400 animate-spin"
+            />
+          </div>
         )}
 
         <button className="w-12 sm:w-14 text-lg sm:text-xl border-l-1 bg-gray-100 hover:bg-gray-50 text-gray-900 hover:text-gray-700 flex items-center justify-center transition cursor-pointer">
@@ -131,9 +133,9 @@ export default function Search() {
                 <div className="flex flex-col">
                   <span className="font-semibold text-sm">{item.name}</span>
                   <span className="text-sm text-gray-600">
-                    Price:{" "}
-                    <span className="text-yellow-600 font-semibold">
-                      {item.price.toLocaleString("vi-VN")}₫
+                    Giá:{" "}
+                    <span className="text-[#dc2626] font-semibold">
+                      {item.price.toLocaleString("vi-VN")} VND
                     </span>
                   </span>
                 </div>
