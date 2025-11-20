@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -21,7 +21,7 @@ export default function RegisterPage() {
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
     const result = await actions.register({
       name,
       email,
@@ -30,7 +30,7 @@ export default function RegisterPage() {
     });
 
     console.log(result);
-    setIsLoading(false);
+    setLoading(false);
 
     if (result.success) {
       navigate("/login");
@@ -48,46 +48,72 @@ export default function RegisterPage() {
       onSubmit={handleRegister}
       className="max-w-sm min-h-screen mx-auto mt-20 space-y-4"
     >
-      <h2 className="text-xl font-semibold text-center">Đăng ký tài khoản</h2>
+      <h2 className="text-3xl font-bold text-center text-gray-800">
+        Đăng ký tài khoản
+      </h2>
 
-      <input
-        type="text"
-        placeholder="Họ và tên"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Mật khẩu"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
-      <input
-        type="password"
-        placeholder="Xác nhận mật khẩu"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        className="w-full border p-2 rounded"
-        required
-      />
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Full Name
+        </label>
+        <input
+          type="text"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nguyen Van A"
+          autoComplete="current-name"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+        <input
+          type="email"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          autoComplete="current-email"
+          required
+        />
+      </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
+        <input
+          type="password"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          autoComplete="current-password"
+          required
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Confirm Password
+        </label>
+        <input
+          type="password"
+          className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="••••••••"
+          autoComplete="current-password"
+          required
+        />
+      </div>
       <button
         type="submit"
-        className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 cursor-pointer"
+        className="w-full bg-gradient-to-br from-[#2F8D3A] to-[#6AC259] text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg hover:opacity-95 transition cursor-pointer"
       >
-        {isLoading ? "Đang xử lý..." : "Đăng ký"}
+        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
       </button>
 
       <p className="text-center text-gray-600">

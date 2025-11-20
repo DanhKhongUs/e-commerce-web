@@ -1,12 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useUserProfile } from "../../../hooks/useUserProfile";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHouse,
-  faExchangeAlt,
   faPlus,
   faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "../../../context/auth/AuthContext";
 
 const menuItems = [
   {
@@ -22,22 +21,15 @@ const menuItems = [
     to: "products",
     icon: faPlus,
   },
-  {
-    id: 2,
-    label: "Quản lý giao dịch",
-    to: "transactions",
-    icon: faExchangeAlt,
-  },
 ];
 
 export default function AdminSidebar() {
-  const { setCurrentUser } = useUserProfile();
+  const { actions } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    navigate("/");
+  const handleLogout = async () => {
+    await actions.logout();
+    navigate("/", { replace: true });
   };
 
   return (

@@ -16,12 +16,14 @@ import Checkout from "./pages/product/CheckOut";
 import MemberLayout from "./components/layout/MemberLayout";
 import AdminLayout from "./components/layout/AdminLayout";
 import DashBoard from "./pages/admin/DashBoard";
-import Transactions from "./pages/admin/Transactions";
 import Home from "./pages/home/Home";
 import AddProductPage from "./pages/admin/AddProduct";
 import OrderSuccess from "./pages/product/CheckoutSuccess";
 import CheckoutSuccess from "./pages/product/CheckoutSuccess";
 import CheckoutFailure from "./pages/product/CheckoutFailure";
+import LoginForAdmin from "./pages/admin/LoginForAdmin";
+import ProtectedRoute from "./components/ProtectedRoute";
+import OrderDetail from "./pages/member/OrderDetail";
 
 function AppContent() {
   const location = useLocation();
@@ -30,7 +32,7 @@ function AppContent() {
   const isAdminPage = location.pathname.startsWith("/admin");
 
   const hideFooterRegex =
-    /^\/($|products\/\d+|cart|checkout|checkout-success|checkout-failure|blogs)$/; // match /products/123, / (home)
+    /^\/(products\/\d+|cart|checkout|checkout-success|checkout-failure|blogs)$/; // match /products/123, / (home)
   const shouldShowFooter =
     !hideFooterRegex.test(location.pathname) && !isAdminPage && !isAuthPage;
 
@@ -50,14 +52,16 @@ function AppContent() {
         <Route path="/account" element={<MemberLayout />}>
           <Route index element={<Profile />} />
           <Route path="transactionHistory" element={<TransactionHistory />} />
+          <Route path="transactionHistory/:id" element={<OrderDetail />} />
         </Route>
-        {/* <Route element={<ProtectedRoute requiredRole="admin" />}> */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<DashBoard />} />
-          <Route path="transactions" element={<Transactions />} />
-          <Route path="products" element={<AddProductPage />} />
+
+        <Route path="/admin/login" element={<LoginForAdmin />} />
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<DashBoard />} />
+            <Route path="products" element={<AddProductPage />} />
+          </Route>
         </Route>
-        {/* </Route> */}
       </Routes>
 
       {shouldShowFooter && <Footer />}

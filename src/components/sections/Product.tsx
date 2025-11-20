@@ -39,7 +39,7 @@ const Product = () => {
       : products.filter((product) => product.category === selectCategory);
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden px-8 mt-12 p-6">
+    <section className="relative min-h-screen w-full overflow-hidden pt-8 mt-12 p-6">
       <div className="flex gap-6">
         <div className="flex-1">
           <div className="flex justify-between mb-2 border-b pb-4">

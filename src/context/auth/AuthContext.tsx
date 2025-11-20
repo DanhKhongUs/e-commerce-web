@@ -1,12 +1,5 @@
 import { createContext, useContext, ReactNode } from "react";
-import { useAuthProvider } from "./useAuthProvider";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-}
+import { useAuthProvider, User } from "./useAuthProvider";
 
 interface AuthContextType {
   user: User | null;

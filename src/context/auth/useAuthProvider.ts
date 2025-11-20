@@ -9,11 +9,11 @@ interface APIResponse<T> {
   data: T;
 }
 
-interface User {
-  id: string;
+export interface User {
+  _id: string;
   name: string;
   email: string;
-  roles: string[];
+  role: string;
 }
 
 interface Credentials {
@@ -70,7 +70,6 @@ export const useAuthProvider = () => {
         return { success: false, message: data.message || "Signup failed." };
       }
       toast.success("SignUp successful. Please signin");
-      window.location.href = "/login";
       return { success: true };
     } catch (error) {
       console.error("SignUp error:", error);
@@ -81,17 +80,16 @@ export const useAuthProvider = () => {
 
   const login = async (credentials: Credentials) => {
     try {
-      const data: APIResponse<User> = await authAPI.signin(credentials);
+      const res: APIResponse<User> = await authAPI.signin(credentials);
 
-      if (!data.success) {
-        toast.error(data.message || "Signin failed.");
-        return { success: false, message: data.message || "Signin failed." };
+      if (!res.success) {
+        toast.error(res.message || "Signin failed.");
+        return { success: false, message: res.message || "Signin failed." };
       }
 
-      setUser(data.data || null);
+      setUser(res.data);
       setIsAuthenticated(true);
       toast.success("SignIn successful");
-      window.location.href = "/";
       return { success: true };
     } catch (error) {
       console.error("SignIn error:", error);
@@ -128,6 +126,8 @@ export const useAuthProvider = () => {
       register,
       login,
       logout,
+      setIsAuthenticated,
+      setUser,
     },
   };
 };
