@@ -5,6 +5,13 @@ import { checkoutCollection } from "models/checkout.model";
 import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } from "vnpay";
 // import querystring from "qs";
 // import crypto from "crypto";
+import { MongoClient, ClientSession } from "mongodb";
+
+function toIntegerAmount(val: unknown) {
+  const n = Number(val || 0);
+  if (!isFinite(n) || isNaN(n) || n < 0) return 0;
+  return Math.round(n);
+}
 
 function generatePayID() {
   const now = new Date();
@@ -22,48 +29,81 @@ export const createCheckout = async (req: AuthRequest, res: Response) => {
     const checkoutCol = await checkoutCollection.getCollection();
     const cartCol = await cartCollection.getCollection();
 
+    const client: MongoClient | undefined =
+      (checkoutCol as any).s?.client || (checkoutCol as any).client;
+    let session: ClientSession | undefined;
+
     const cart = await cartCol.findOne({ userId });
     if (!cart) {
       return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
     }
 
+    const snapshotTotalPrice = toIntegerAmount(cart.totalPrice);
+    let snapshotFinalPrice = toIntegerAmount(cart.finalPrice);
+    if (snapshotFinalPrice === 0) snapshotFinalPrice = snapshotTotalPrice;
+
     if (typePayment === "cod") {
       const orderId = generatePayID();
 
-      const newOrder = await checkoutCol.insertOne({
+      const orderData = {
         orderId,
         userId,
-        products: cart.products,
-        totalPrice: cart.totalPrice,
-        finalPrice: cart.finalPrice,
-        fullName: cart.fullName,
-        phoneNumber: cart.phoneNumber,
-        address: cart.address,
-        email: cart.email,
+        products: cart.products || [],
+        totalPrice: snapshotTotalPrice,
+        finalPrice: snapshotFinalPrice,
+        fullName: cart.fullName || "",
+        phoneNumber: cart.phoneNumber || "",
+        address: cart.address || "",
+        email: cart.email || "",
         paymentMethod: "cod",
         status: "pending",
         createdAt: new Date(),
-      });
-
-      await cartCol.deleteOne({ userId });
-      await cartCol.insertOne({
-        userId,
-        products: [],
-        totalPrice: 0,
-        finalPrice: 0,
-        fullName: "",
-        phoneNumber: "",
-        address: "",
-        email: "",
-      });
+      };
+      if (client) {
+        session = client.startSession();
+        await session.withTransaction(async () => {
+          await checkoutCol.insertOne(orderData, { session });
+          await cartCol.updateOne(
+            { userId },
+            {
+              $set: {
+                products: [],
+                totalPrice: 0,
+                finalPrice: 0,
+                fullName: "",
+                phoneNumber: "",
+                address: "",
+                email: "",
+              },
+            },
+            { session }
+          );
+        });
+        session.endSession();
+      } else {
+        await checkoutCol.insertOne(orderData);
+        await cartCol.updateOne(
+          { userId },
+          {
+            $set: {
+              products: [],
+              totalPrice: 0,
+              finalPrice: 0,
+              fullName: "",
+              phoneNumber: "",
+              address: "",
+              email: "",
+            },
+          }
+        );
+      }
 
       return res.status(200).json({
         message: "Tạo đơn hàng COD thành công",
         orderId,
-        metadata: newOrder,
+        metadata: { order: orderData },
       });
     }
-
     if (typePayment === "vnpay") {
       const orderId = generatePayID();
 
