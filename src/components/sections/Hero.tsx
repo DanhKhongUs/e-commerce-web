@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-const images = [
-  "/landing/hero1.png",
-  "/landing/hero2.png",
-  "/landing/hero3.png",
-  "/landing/hero4.png",
-];
+const images = ["/hero1.jpg", "/hero2.png", "/hero3.png", "/hero4.jpg"];
 
 const Hero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -28,39 +23,36 @@ const Hero = () => {
               DO IT <span className="text-[#4a69e2]">RIGHT</span>
             </h1>
           </div>
-          <div>
+          <div className="relative w-full">
             <img
-              src="/landing/slide.png"
-              alt="Nike Air Max"
+              src="/slide.png"
+              alt="ecommerce-banner"
               width={700}
               height={700}
-              className="w-full h-[420px] sm:h-[500px] md:h-[680px] object-cover rounded-2xl shadow-lg "
+              className="w-full h-[420px] sm:h-[500px] md:h-[680px] object-cover rounded-2xl shadow-xl"
             />
 
-            <div className="absolute bottom-6 left-4 sm:bottom-8 sm:left-8 text-white max-w-xs sm:max-w-md">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                NIKE AIR MAX
+            <div className="absolute inset-0 bg-black/30 rounded-2xl"></div>
+
+            <div className="absolute inset-0 flex flex-col items-start justify-center text-white px-4 text-start">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold drop-shadow-xl tracking-wide">
+                TECH E-COMMERCE
               </h2>
-              <p className="text-sm sm:text-base md:text-lg mt-2">
-                Nike introducing the new air
-                <br /> max for everyone&apos;s comfort
+              <p className="text-sm sm:text-lg md:text-xl mt-3 opacity-90">
+                We always prioritize product <br /> quality over quantity.
               </p>
             </div>
 
-            <div className="absolute bottom-8 right-8 flex flex-col gap-3">
+            <div className="absolute bottom-6 right-6 flex flex-col gap-4">
               <img
-                src="/landing/zoom1.png"
-                alt="Nike thumb 1"
-                width={100}
-                height={100}
-                className="w-24 h-24 rounded-lg object-cover shadow-md"
+                src="/thumb2.jpg"
+                alt="thumb1"
+                className="w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28 rounded-xl border-4 border-white object-cover shadow-xl"
               />
               <img
-                src="/landing/zoom2.png"
-                alt="Nike thumb 2"
-                width={100}
-                height={100}
-                className="w-24 h-24 rounded-lg object-cover shadow-md"
+                src="/thumb1.jpg"
+                alt="thumb2"
+                className="w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28 rounded-xl border-4 border-white object-cover shadow-xl"
               />
             </div>
           </div>
@@ -70,11 +62,11 @@ const Hero = () => {
         <div className="relative w-full h-[680px] hidden xl:flex items-center justify-center ">
           <div className="absolute inset-0 z-0">
             <img
-              src="/landing/slide2.png"
+              src="/slide2.png"
               alt="slide 2"
               width={700}
               height={700}
-              className="w-full h-[700px] object-cover rounded-2xl shadow-lg blur-xl"
+              className="w-full h-[700px] object-cover rounded-2xl shadow-lg blur-lg"
             />
           </div>
 

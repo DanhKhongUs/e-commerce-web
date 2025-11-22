@@ -59,7 +59,7 @@ export default function Header() {
             <img
               src="/logo.png"
               alt="Logo"
-              className="w-20 h-24 md:w-26 md:h-28 rounded-full object-cover "
+              className="w-20 h-20 md:w-22 md:h-22 rounded-full border object-cover"
             />
           </Link>
         </div>

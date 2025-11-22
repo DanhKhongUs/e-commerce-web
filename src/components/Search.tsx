@@ -7,6 +7,7 @@ import {
   faSpinner,
 } from "@fortawesome/free-solid-svg-icons";
 import { getAllProducts } from "../services/productService";
+import { useNavigate } from "react-router-dom";
 
 export default function Search() {
   const [search, setSearch] = useState("");
@@ -18,6 +19,8 @@ export default function Search() {
   const inputRef = useRef<HTMLInputElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -78,6 +81,11 @@ export default function Search() {
     inputRef.current?.focus();
   };
 
+  const handleSubmit = (productId: string) => {
+    navigate(`/products/${productId}`);
+    setShowSuggestions(false);
+  };
+
   return (
     <div ref={wrapperRef} className="relative w-full xl:w-[500px]">
       {/* Input */}
@@ -123,6 +131,7 @@ export default function Search() {
             results.map((item) => (
               <div
                 key={item.id}
+                onClick={() => handleSubmit(item.id)}
                 className="flex items-center gap-4 px-4 py-2 border-b hover:bg-gray-100 cursor-pointer"
               >
                 <img

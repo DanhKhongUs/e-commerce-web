@@ -8,21 +8,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { getAllOrders } from "../../services/orderService";
-import { IProduct } from "../../types";
+
+interface OrderItemDetail {
+  imageUrl: string;
+  name: string;
+}
+
 interface ApiTransaction {
-  order: {
-    id: string;
-    status: string;
-    amount: number;
-    products: IProduct;
-    createdAt: string;
-    method: string;
-  };
-  userId: string;
+  id: string;
+  status: string;
+  amount: number;
+  products: OrderItemDetail[];
+  createdAt: string;
 }
 
 const statusConfig = {
-  paid: {
+  success: {
     label: "Đã thanh toán",
     color: "bg-green-100 text-green-700",
     icon: <FontAwesomeIcon icon={faCircleCheck} />,
@@ -32,7 +33,7 @@ const statusConfig = {
     color: "bg-yellow-100 text-yellow-700",
     icon: <FontAwesomeIcon icon={faClock} />,
   },
-  cancelled: {
+  failed: {
     label: "Đã hủy",
     color: "bg-red-100 text-red-700",
     icon: <FontAwesomeIcon icon={faXmark} />,
@@ -46,9 +47,26 @@ export default function TransactionHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       setIsLoading(true);
-      const data = await getAllOrders();
-      setTransactions(data);
-      setIsLoading(false);
+      try {
+        const data = await getAllOrders();
+
+        const formatted = data.map((order: any) => ({
+          id: order.id,
+          createdAt: order.createdAt,
+          status: order.status,
+          amount: order.amount,
+          products: order.products.map((p: any) => ({
+            imageUrl: p.imageUrl,
+            name: p.name,
+          })),
+        }));
+
+        setTransactions(formatted);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchHistory();
@@ -72,57 +90,51 @@ export default function TransactionHistory() {
       ) : (
         <div className="space-y-4">
           {transactions.map((tx, index) => {
-            const { order } = tx;
+            const { id, status, amount, createdAt, products } = tx;
 
-            const statusKey =
-              order.status.toLowerCase() as keyof typeof statusConfig;
-            const status = statusConfig[statusKey];
-
-            if (!status) {
-              return (
-                <motion.div
-                  key={order.id}
-                  className="flex items-center justify-between bg-gray-50 p-4"
-                >
-                  <p>Mã đơn: {order.id}</p>
-                  <p className="text-red-500">
-                    Trạng thái không xác định: {order.status}
-                  </p>
-                </motion.div>
-              );
-            }
+            const statusKey = status.toLowerCase() as keyof typeof statusConfig;
+            const statusInfo = statusConfig[statusKey] || statusConfig.pending;
+            const firstProduct = products[0];
 
             return (
               <motion.div
-                key={order.id}
+                key={id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className="flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition rounded-xl p-4"
               >
-                <div>
-                  <p className="font-semibold text-gray-800">
-                    Mã đơn: {order.id}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Ngày:{" "}
-                    {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-                  </p>
+                <div className="flex gap-8">
+                  <img
+                    src={firstProduct.imageUrl}
+                    alt={firstProduct.name}
+                    className="w-20 h-20 rounded-lg object-cover border"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {firstProduct.name}
+                    </p>
+
+                    <p className="text-gray-500">Mã đơn: {id}</p>
+                    <p className="text-sm text-gray-500">
+                      Ngày: {new Date(createdAt).toLocaleDateString("vi-VN")}
+                    </p>
+                  </div>
                 </div>
 
                 <div className="text-right flex flex-col items-end">
                   <p className="font-semibold text-lg text-gray-800">
-                    {order.amount.toLocaleString("vi-VN")}₫
+                    {amount.toLocaleString("vi-VN")} VND
                   </p>
                   <div
-                    className={`inline-flex items-center px-2 py-1 text-sm font-medium rounded-full mt-1 ${status.color}`}
+                    className={`inline-flex items-center px-2 py-1 text-sm font-medium rounded-full mt-1 ${statusInfo.color}`}
                   >
-                    {status.icon}
-                    {status.label}
+                    {statusInfo.icon}
+                    {statusInfo.label}
                   </div>
                   <Link
-                    to={`/account/transactionHistory/${order.id}`}
-                    className="w-full flex justify-end mt-2 text-sm text-blue-600 hover:underline"
+                    to={`/account/transactionHistory/${id}`}
+                    className="w-full flex justify-end mt-2 text-base text-blue-600 hover:underline"
                   >
                     Xem chi tiết
                   </Link>

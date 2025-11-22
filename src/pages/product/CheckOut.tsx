@@ -169,7 +169,7 @@ const Checkout = () => {
           {selectedPayment === "vnpay" && (
             <div className="mt-4">
               <img
-                src="/momo.png"
+                src="/vnpay.png"
                 alt="VNPAY"
                 className="w-40 h-auto mx-auto"
               />

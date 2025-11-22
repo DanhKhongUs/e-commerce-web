@@ -1,12 +1,15 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 import AccountSidebar from "../../components/layout/SideBar/AccountSidebar";
 
 export default function MemberLayout() {
   const location = useLocation();
+  const { id } = useParams<{ id: string }>();
 
   const getCurrentLabel = (pathname: string) => {
     if (pathname.endsWith("/account/transactionHistory"))
       return "LỊCH SỬ GIAO DỊCH";
+    if (pathname.endsWith(`/account/transactionHistory/${id}`))
+      return "CHI TIẾT LỊCH SỬ GIAO DỊCH";
     return "THÔNG TIN CÁ NHÂN";
   };
 
