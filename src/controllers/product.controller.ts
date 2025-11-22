@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { categoryCollection } from "models/category.model";
 import { productCollection } from "models/product.model";
 import { ObjectId } from "mongodb";
 

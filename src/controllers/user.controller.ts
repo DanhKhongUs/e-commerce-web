@@ -61,7 +61,7 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "WRONG_PASSWORD" });
 
     const token = jwt.sign(
-      { _id: user._id.toString(), email, role: user.role || "user" },
+      { _id: user._id.toString(), email, role: user.role },
       process.env.JWT_SECRET!,
       {
         expiresIn: "7d",

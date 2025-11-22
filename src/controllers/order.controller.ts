@@ -1,110 +1,118 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "middleware/auth";
-import { orderCollection } from "models/order.model";
-import { ObjectId } from "mongodb";
+import { checkoutCollection } from "models/checkout.model";
 
 export const getAllOrders = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;
-    if (!userId) return res.status(401).json({ error: "UNAUTHORIZED" });
-
-    const orderCol = await orderCollection.getCollection();
-
-    const orders = await orderCol
+    if (!userId) {
+      return res.status(401).json({ error: "UNAUTHORIZED" });
+    }
+    const checkoutCol = await checkoutCollection.getCollection();
+    const checkouts = await checkoutCol
       .find({ userId })
       .sort({ createdAt: -1 })
       .toArray();
+
+    const orders = checkouts.map((o) => ({
+      id: o.orderId,
+      status: o.status,
+      amount: o.finalPrice ?? o.totalPrice ?? 0,
+      products: o.products,
+      createdAt: o.createdAt,
+      method: o.paymentMethod,
+    }));
     res.json(orders);
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
 
 export const getOrderById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id: orderId } = req.params;
 
-    const orderCol = await orderCollection.getCollection();
+    const checkoutCol = await checkoutCollection.getCollection();
+    const orderCol = await checkoutCol.findOne({ orderId });
 
-    const order = await orderCol.findOne({ _id: new ObjectId(id) });
+    if (!orderCol) {
+      return res.status(404).json({ error: "ORDER_NOT_FOUND" });
+    }
 
-    if (!order) return res.status(404).json({ error: "Order not found" });
+    const statusValue =
+      typeof orderCol.status === "string"
+        ? orderCol.status
+        : orderCol.status?.state || orderCol.status?.value || "pending";
 
-    res.json(order);
+    const order = {
+      order: {
+        id: orderCol.orderId,
+        status: statusValue,
+        amount: orderCol.finalPrice ?? orderCol.totalPrice ?? 0,
+        createdAt: orderCol.createdAt,
+        method: orderCol.paymentMethod,
+        products: orderCol.products,
+      },
+      userId: orderCol.userId,
+    };
+
+    return res.json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
+export const createOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.status(400).json({ error: "UNAUTHORIZED" });
+
+    const { orderId, amount, paymentMethod } = req.body;
+    const checkoutCol = await checkoutCollection.getCollection();
+
+    const newOrder = {
+      orderId,
+      userId,
+      amount,
+      paymentMethod,
+      status: "pending",
+      createAt: new Date(),
+    };
+
+    await checkoutCol.insertOne(newOrder);
+
+    return res.status(200).json({ success: true, orderId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
 
-export const getAllOrdersAdminOnly = async (req: Request, res: Response) => {
+export const deleteOrder = async (req: AuthRequest, res: Response) => {
   try {
-    const orderCol = await orderCollection.getCollection();
-    const orders = await orderCol.find({}).toArray();
-    res.json(orders);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
-  }
-};
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ error: "UNAUTHORIZED" });
+    }
 
-export const updateOrder = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
+    const { id: orderId } = req.params;
 
-    const orderCol = await orderCollection.getCollection();
-    const order = await orderCol.findOne({ _id: new ObjectId(id) });
+    const checkoutCol = await checkoutCollection.getCollection();
 
+    const order = await checkoutCol.findOne({ orderId });
     if (!order) {
-      return res.status(404).json({ error: "Order not found" });
+      return res.status(404).json({ error: "ORDER_NOT_FOUND" });
     }
 
-    const updatedFields: any = {};
-    if (status) {
-      updatedFields.status = status;
-      if (status === "Delivered") {
-        updatedFields.isDelivered = true;
-        updatedFields.deliveredAt = new Date();
-      }
+    if (order.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: "FORBIDDEN" });
     }
 
-    const result = await orderCol.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updatedFields }
-    );
+    await checkoutCol.deleteOne({ orderId });
 
-    if (result.modifiedCount === 0) {
-      return res.status(400).json({ error: "Failed to update the order" });
-    }
-
-    const updatedOrder = await orderCol.findOne({ _id: new ObjectId(id) });
-    res.json(updatedOrder);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
-  }
-};
-
-export const deleteOrder = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const orderCol = await orderCollection.getCollection();
-
-    const order = await orderCol.findOne({ _id: new ObjectId(id) });
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" });
-    }
-
-    const result = await orderCol.deleteOne({ _id: new ObjectId(id) });
-
-    if (result.deletedCount === 1) {
-      return res.json({ message: "Order removed successfully" });
-    } else {
-      return res.status(500).json({ message: "Failed to remove order" });
-    }
+    return res.json({ success: true, message: "Order deleted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });

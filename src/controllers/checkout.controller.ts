@@ -3,8 +3,8 @@ import { AuthRequest } from "middleware/auth";
 import { cartCollection } from "models/cart.model";
 import { checkoutCollection } from "models/checkout.model";
 import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } from "vnpay";
-import querystring from "qs";
-import crypto from "crypto";
+// import querystring from "qs";
+// import crypto from "crypto";
 
 function generatePayID() {
   const now = new Date();

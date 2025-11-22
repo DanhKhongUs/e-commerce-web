@@ -25,6 +25,7 @@ export const verifyToken = (
       role: "user" | "admin";
       _id: ObjectId;
     };
+
     req.user = {
       _id: new ObjectId(decoded._id),
       email: decoded.email,
