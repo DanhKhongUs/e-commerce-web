@@ -54,7 +54,7 @@ export default function RegisterPage() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Full Name
+          Họ và tên
         </label>
         <input
           type="text"
@@ -83,7 +83,7 @@ export default function RegisterPage() {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Password
+          Mật khẩu
         </label>
         <input
           type="password"
@@ -97,7 +97,7 @@ export default function RegisterPage() {
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Confirm Password
+          Xác nhận mật khẩu
         </label>
         <input
           type="password"
@@ -113,7 +113,7 @@ export default function RegisterPage() {
         type="submit"
         className="w-full bg-gradient-to-br from-[#2F8D3A] to-[#6AC259] text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg hover:opacity-95 transition cursor-pointer"
       >
-        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        {loading ? "Đang đăng ky..." : "Đăng ký"}
       </button>
 
       <p className="text-center text-gray-600">

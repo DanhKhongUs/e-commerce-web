@@ -15,7 +15,6 @@ const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
 
   useEffect(() => {
     isRedirecting.current = false;
-    console.log("User", user);
   }, [user]);
 
   if (isLoading) {

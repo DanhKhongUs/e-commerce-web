@@ -67,7 +67,7 @@ export default function ProductManager() {
       setIsEdit(true);
       try {
         const res = await getProductById(editProduct.id);
-        const productData = res.data.product;
+        const productData = res.data;
         setNewProduct({
           ...productData,
           category:
