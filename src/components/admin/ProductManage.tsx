@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { Modal } from "antd";
 import { ICategory, IProduct } from "../../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import {
   createProduct,
   deleteProduct,
@@ -169,7 +169,7 @@ export default function ProductManager() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
+    <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">
           Danh sách sản phẩm ({products.length})
@@ -182,51 +182,64 @@ export default function ProductManager() {
         </button>
       </div>
 
-      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-        <thead className="bg-gray-50 border-b">
-          <tr className="text-left text-gray-700">
-            <th className="p-3">ẢNH</th>
-            <th className="p-3">TÊN</th>
-            <th className="p-3">GIÁ</th>
-            <th className="p-3">DANH MỤC</th>
-            <th className="p-3 text-center">HÀNH ĐỘNG</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) => {
-            const categoryName =
-              categories?.find((c) => c.category_id === p.category)
-                ?.category_name || "Không có danh mục";
-            return (
-              <tr key={p.id} className="border-b hover:bg-gray-50">
-                <td className="p-3">
-                  <img
-                    src={p.imageUrl || "/default-product.jpg"}
-                    alt={p.name}
-                    className="w-16 h-16 object-cover rounded-md border"
-                  />
-                </td>
-                <td className="p-3 font-medium">{p.name}</td>
-                <td className="p-3">{p.price.toLocaleString()} VND</td>
-                <td className="p-3">{categoryName}</td>
-
-                <td className="p-3 mt-6 flex justify-center items-center gap-4">
-                  <FontAwesomeIcon
-                    icon={faEdit}
-                    className="text-blue-500 cursor-pointer"
-                    onClick={() => handleOpen(p)}
-                  />
-                  <FontAwesomeIcon
-                    icon={faTrash}
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => handleDelete(p.id)}
-                  />
-                </td>
+      <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+        <div className="max-h-[706px] overflow-y-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-100 sticky top-0 z-10 border-b">
+              <tr className="text-gray-700 text-sm uppercase tracking-wide">
+                <th className="p-4">ẢNH</th>
+                <th className="p-4">TÊN</th>
+                <th className="p-4">GIÁ</th>
+                <th className="p-4">DANH MỤC</th>
+                <th className="p-4 text-center">HÀNH ĐỘNG</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {products.map((p) => {
+                const categoryName =
+                  categories?.find((c) => c.category_id === p.category)
+                    ?.category_name || "Không có danh mục";
+                return (
+                  <tr key={p.id} className="border-b hover:bg-gray-50">
+                    <td className="p-4">
+                      <img
+                        src={p.imageUrl || "/default-product.jpg"}
+                        alt={p.name}
+                        className="w-16 h-16 object-cover rounded-md border"
+                      />
+                    </td>
+                    <td className="p-4 font-medium">{p.name}</td>
+                    <td className="p-4">{p.price.toLocaleString()} VND</td>
+                    <td className="p-4">{categoryName}</td>
+
+                    <td className="p-4 mt-6 flex justify-center items-center gap-4">
+                      <FontAwesomeIcon
+                        icon={faEdit}
+                        className="text-blue-500 cursor-pointer"
+                        onClick={() => handleOpen(p)}
+                        size="lg"
+                      />
+                      <FontAwesomeIcon
+                        icon={faTrashCan}
+                        className="text-red-500 cursor-pointer"
+                        onClick={() => handleDelete(p.id)}
+                        size="lg"
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+              {products.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="p-6 text-center text-gray-500">
+                    Không có sản phẩm nào .
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <Modal
         title={isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}

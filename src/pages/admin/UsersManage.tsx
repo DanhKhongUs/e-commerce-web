@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import httpRequest from "../../utils/httpRequest";
 import { toast } from "react-toastify";
@@ -19,6 +19,7 @@ export default function UsersManage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
   const fetchUsers = async () => {
     try {
       const res = await httpRequest("/admin/users");
@@ -29,7 +30,7 @@ export default function UsersManage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Bạn có chắc muốn xóa không")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa người dùng này?")) return;
 
     try {
       await httpRequest.delete(`/admin/users/${id}`);
@@ -42,65 +43,96 @@ export default function UsersManage() {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="min-w-full text-sm text-gray-700">
-          <thead className="bg-gray-100 text-left uppercase text-xs font-semibold">
-            <tr>
-              <th className="px-6 py-3 text-base font-semibold text-gray-600">
-                TÊN
-              </th>
-              <th className="px-6 py-3 text-base font-semibold text-gray-600">
-                EMAIL
-              </th>
-              <th className="px-6 py-3 text-base font-semibold text-gray-600">
-                VAI TRÒ
-              </th>
-              <th className="px-6 py-3 text-base font-semibold text-gray-600">
-                NGÀY TẠO
-              </th>
-              <th className="px-6 py-3 text-base font-semibold text-gray-600">
-                HÀNH ĐỘNG
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr
-                key={user._id}
-                className="border-t hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-6 py-4 flex items-center gap-3">
-                  <svg
-                    className="w-12 h-12 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 12c2.7 0 4.9-2.2 4.9-4.9S14.7 2.2 12 2.2 7.1 4.4 7.1 7.1 9.3 12 12 12zm0 2c-3.2 0-9.5 1.6-9.5 4.9V22h19v-3.1c0-3.3-6.3-4.9-9.5-4.9z" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold">{user.name}</p>
-                    <p className="text-gray-500 text-sm">{user.email}</p>
-                  </div>
-                </td>
-                <td className="px-6 py-4">{user.email}</td>
-                <td className="px-6 py-4">{user.role}</td>
-                <td className="px-6 py-4">
-                  {new Date(user.created_at).toLocaleDateString("vi-VN")}
-                </td>
-                <td className="px-6 py-4 text-gray-500">
-                  <button
-                    onClick={() => handleDelete(user._id)}
-                    title="Xoá người dùng"
-                    className="hover:text-red-600 transition mr-3"
-                  >
-                    <FontAwesomeIcon icon={faTrash} size="lg" />
-                  </button>
-                </td>
+    <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+      <div className="flex justify-between items-center mb-6 mt-1">
+        <h2 className="text-2xl font-semibold">
+          Danh sách người dùng ({users.length})
+        </h2>
+      </div>
+
+      <div className="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+        <div className="max-h-[706px] overflow-y-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-100 sticky top-0 z-10 border-b">
+              <tr className="text-gray-700 text-sm uppercase tracking-wide">
+                <th className="p-4">Người dùng</th>
+                <th className="p-4">Email</th>
+                <th className="p-4">Vai trò</th>
+                <th className="p-4">Ngày tạo</th>
+                <th className="p-4 text-center">Hành động</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {users.map((user) => (
+                <tr
+                  key={user._id}
+                  className="hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <td className="p-4">
+                    <div className="flex items-center gap-4">
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt="avatar"
+                          className="w-12 h-12 rounded-full object-cover border"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          {user.name}
+                        </p>
+                        <p className="text-gray-500 text-sm">{user.email}</p>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="p-4 text-gray-700">{user.email}</td>
+
+                  <td className="p-4">
+                    <span
+                      className={`px-2 py-1 rounded-md font-medium 
+                      ${
+                        user.role === "admin"
+                          ? "bg-red-100 text-red-600"
+                          : "bg-blue-100 text-blue-600"
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
+
+                  <td className="p-4 text-gray-700">
+                    {new Date(user.created_at).toLocaleDateString("vi-VN")}
+                  </td>
+
+                  <td className="p-4 text-center">
+                    <button
+                      onClick={() => handleDelete(user._id)}
+                      className="text-red-500 hover:text-red-400 transition"
+                      title="Xóa người dùng"
+                    >
+                      <FontAwesomeIcon icon={faTrashCan} size="lg" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="p-6 text-center text-gray-500">
+                    Không có người dùng nào.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
