@@ -2,6 +2,49 @@ import { Request, Response } from "express";
 import { AuthRequest } from "middleware/auth";
 import { checkoutCollection } from "models/checkout.model";
 
+export const getOrderForAdmin = async (req: Request, res: Response) => {
+  try {
+    const checkoutCol = await checkoutCollection.getCollection();
+    const checkouts = await checkoutCol
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const orders = checkouts.map((o) => ({
+      id: o.orderId,
+      status: o.status,
+      amount: o.finalPrice ?? o.totalPrice ?? 0,
+      products: o.products,
+      createdAt: o.createdAt,
+      method: o.paymentMethod,
+    }));
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
+export const deleteOrderForAdmin = async (req: Request, res: Response) => {
+  try {
+    const { id: orderId } = req.params;
+
+    const checkoutCol = await checkoutCollection.getCollection();
+
+    const order = await checkoutCol.findOne({ orderId });
+    if (!order) {
+      return res.status(404).json({ error: "ORDER_NOT_FOUND" });
+    }
+
+    await checkoutCol.deleteOne({ orderId });
+
+    return res.json({ success: true, message: "Order deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
 export const getAllOrders = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?._id;

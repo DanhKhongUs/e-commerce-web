@@ -1,8 +1,16 @@
-import { loginUser } from "controllers/user.controller";
+import {
+  deleteUser,
+  getAllUsers,
+  loginUser,
+} from "controllers/user.controller";
 import express, { Request, Response } from "express";
 import { requireAdmin, verifyToken } from "middleware/auth";
 import { userCollection } from "models/user.model";
 import crypto from "crypto";
+import {
+  deleteOrderForAdmin,
+  getOrderForAdmin,
+} from "controllers/order.controller";
 
 const router = express.Router();
 
@@ -48,5 +56,11 @@ router.post(
     }
   }
 );
+
+router.get("/users", getAllUsers);
+router.delete("/users/:id", deleteUser);
+
+router.get("/orders", getOrderForAdmin);
+router.delete("/orders/:id", deleteOrderForAdmin);
 
 export default router;
