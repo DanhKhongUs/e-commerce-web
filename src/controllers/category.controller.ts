@@ -61,7 +61,12 @@ export const createCategory = async (req: Request, res: Response) => {
 
 export const updateCategory = async (req: Request, res: Response) => {
   try {
-    const { _id, category_id, category_name } = req.body;
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id))
+      return res.status(400).json({ error: "Category ID is required" });
+
+    const { category_id, category_name } = req.body;
 
     if (!category_id || !category_name)
       return res.status(400).json({ error: "INVALID_DATA" });
@@ -75,7 +80,7 @@ export const updateCategory = async (req: Request, res: Response) => {
 
     const result = await col.updateOne(
       {
-        _id: new ObjectId(_id),
+        _id: new ObjectId(id),
       },
       {
         $set: {
