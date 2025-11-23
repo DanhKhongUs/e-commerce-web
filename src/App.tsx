@@ -24,6 +24,8 @@ import CheckoutFailure from "./pages/product/CheckoutFailure";
 import LoginForAdmin from "./pages/admin/LoginForAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrderDetail from "./pages/member/OrderDetail";
+import UsersManage from "./pages/admin/UsersManage";
+import OrdersManage from "./pages/admin/OrdersManage";
 
 function AppContent() {
   const location = useLocation();
@@ -60,6 +62,8 @@ function AppContent() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<DashBoard />} />
             <Route path="products" element={<AddProductPage />} />
+            <Route path="users" element={<UsersManage />} />
+            <Route path="orders" element={<OrdersManage />} />
           </Route>
         </Route>
       </Routes>

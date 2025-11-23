@@ -1,25 +1,39 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCartShopping,
   faHouse,
   faPlus,
   faSignOutAlt,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../../../context/auth/AuthContext";
 
 const menuItems = [
   {
     id: 0,
-    label: "Bảng điều khiển",
+    label: "Dashboard",
     to: ".",
     icon: faHouse,
   },
 
   {
     id: 1,
-    label: "Thêm sản phẩm",
+    label: "Quản lý sản phẩm",
     to: "products",
     icon: faPlus,
+  },
+  {
+    id: 2,
+    label: "Quản lý người dùng",
+    to: "users",
+    icon: faUser,
+  },
+  {
+    id: 3,
+    label: "Quản lý đơn hàng",
+    to: "orders",
+    icon: faCartShopping,
   },
 ];
 

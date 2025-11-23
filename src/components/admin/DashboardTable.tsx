@@ -7,15 +7,24 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  faArrowTrendUp,
+  faCartShopping,
   faDollarSign,
   faExchangeAlt,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import httpRequest from "../../utils/httpRequest";
 
 export default function DashboardTable() {
+  const [dashboard, setDashboard] = useState<{
+    totalProducts: number;
+    totalUsers: number;
+    totalOrders: number;
+    totalRevenue: number;
+  } | null>(null);
+
   const revenueData = useMemo(
     () => [
       { month: "Jan", revenue: 25000000, transactions: 120 },
@@ -32,19 +41,43 @@ export default function DashboardTable() {
     []
   );
 
-  const totalTransactions = revenueData.reduce(
-    (sum, d) => sum + d.transactions,
-    0
-  );
-  const totalRevenue = revenueData.reduce((sum, d) => sum + d.revenue, 0);
-
-  const last = revenueData[revenueData.length - 1];
-  const prev = revenueData[revenueData.length - 2];
-  const growthRate = ((last.revenue - prev.revenue) / prev.revenue) * 100;
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await httpRequest("/admin/dashboard");
+        setDashboard(res.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchDashboard();
+  }, []);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+          <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
+            <FontAwesomeIcon icon={faCartShopping} className="text-xl" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Tổng số sản phẩm</p>
+            <h3 className="text-2xl font-semibold">
+              {(dashboard?.totalProducts ?? 0).toLocaleString("vi-VN")}
+            </h3>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+          <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
+            <FontAwesomeIcon icon={faUser} className="text-xl" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Tổng số người dùng</p>
+            <h3 className="text-2xl font-semibold">
+              {(dashboard?.totalUsers ?? 0).toLocaleString("vi-VN")}
+            </h3>
+          </div>
+        </div>
         <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
           <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
             <FontAwesomeIcon icon={faExchangeAlt} className="text-xl" />
@@ -52,7 +85,7 @@ export default function DashboardTable() {
           <div>
             <p className="text-sm text-gray-500">Tổng số giao dịch</p>
             <h3 className="text-2xl font-semibold">
-              {totalTransactions.toLocaleString("vi-VN")}
+              {(dashboard?.totalOrders ?? 0).toLocaleString("vi-VN")}
             </h3>
           </div>
         </div>
@@ -64,22 +97,7 @@ export default function DashboardTable() {
           <div>
             <p className="text-sm text-gray-500">Tổng doanh thu</p>
             <h3 className="text-2xl font-semibold">
-              {totalRevenue.toLocaleString("vi-VN")} VND
-            </h3>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
-          <div className="bg-orange-100 text-orange-600 p-3 rounded-full">
-            <FontAwesomeIcon icon={faArrowTrendUp} className="text-xl" />
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Tăng trưởng tháng này</p>
-            <h3
-              className={`text-2xl font-semibold ${
-                growthRate >= 0 ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {growthRate.toFixed(1)}%
+              {(dashboard?.totalRevenue ?? 0).toLocaleString("vi-VN")} VND
             </h3>
           </div>
         </div>
