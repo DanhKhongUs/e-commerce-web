@@ -21,6 +21,143 @@ function generatePayID() {
   return `PAY${timestamp}${seconds}${milliseconds}`;
 }
 
+// export const createCheckout = async (req: AuthRequest, res: Response) => {
+//   try {
+//     const { typePayment } = req.body;
+//     const userId = req.user?._id;
+
+//     const checkoutCol = await checkoutCollection.getCollection();
+//     const cartCol = await cartCollection.getCollection();
+
+//     const client: MongoClient | undefined =
+//       (checkoutCol as any).s?.client || (checkoutCol as any).client;
+//     let session: ClientSession | undefined;
+
+//     const cart = await cartCol.findOne({ userId });
+//     if (!cart) {
+//       return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
+//     }
+
+//     const snapshotTotalPrice = toIntegerAmount(cart.totalPrice);
+//     let snapshotFinalPrice = toIntegerAmount(cart.finalPrice);
+//     if (snapshotFinalPrice === 0) snapshotFinalPrice = snapshotTotalPrice;
+
+//     if (typePayment === "cod") {
+//       const orderId = generatePayID();
+
+//       const orderData = {
+//         orderId,
+//         userId,
+//         products: cart.products || [],
+//         totalPrice: snapshotTotalPrice,
+//         finalPrice: snapshotFinalPrice,
+//         fullName: cart.fullName || "",
+//         phoneNumber: cart.phoneNumber || "",
+//         address: cart.address || "",
+//         email: cart.email || "",
+//         paymentMethod: "cod",
+//         status: "pending",
+//         createdAt: new Date(),
+//       };
+//       if (client) {
+//         session = client.startSession();
+//         await session.withTransaction(async () => {
+//           await checkoutCol.insertOne(orderData, { session });
+//           await cartCol.updateOne(
+//             { userId },
+//             {
+//               $set: {
+//                 products: [],
+//                 totalPrice: 0,
+//                 finalPrice: 0,
+//                 fullName: "",
+//                 phoneNumber: "",
+//                 address: "",
+//                 email: "",
+//               },
+//             },
+//             { session }
+//           );
+//         });
+//         session.endSession();
+//       } else {
+//         await checkoutCol.insertOne(orderData);
+//         await cartCol.updateOne(
+//           { userId },
+//           {
+//             $set: {
+//               products: [],
+//               totalPrice: 0,
+//               finalPrice: 0,
+//               fullName: "",
+//               phoneNumber: "",
+//               address: "",
+//               email: "",
+//             },
+//           }
+//         );
+//       }
+
+//       return res.status(200).json({
+//         message: "Tạo đơn hàng COD thành công",
+//         orderId,
+//         metadata: { order: orderData },
+//       });
+//     }
+//     if (typePayment === "vnpay") {
+//       const orderId = generatePayID();
+
+//       await checkoutCol.insertOne({
+//         orderId,
+//         userId,
+//         products: cart.products,
+//         totalPrice: snapshotTotalPrice,
+//         finalPrice: snapshotFinalPrice,
+//         fullName: cart.fullName,
+//         phoneNumber: cart.phoneNumber,
+//         address: cart.address,
+//         email: cart.email,
+//         paymentMethod: "vnpay",
+//         status: "pending",
+//         createdAt: new Date(),
+//       });
+
+//       const vnpay = new VNPay({
+//         tmnCode: "E5GKRD4W",
+//         secureSecret: "DXGVPNRODG7MNLJ3JNH1BWYVX7SKDCRZ",
+//         vnpayHost: "https://sandbox.vnpayment.vn",
+//         testMode: true,
+//         loggerFn: ignoreLogger,
+//       });
+
+//       const tomorrow = new Date();
+//       tomorrow.setDate(tomorrow.getDate() + 1);
+
+//       const paymentUrl = vnpay.buildPaymentUrl({
+//         vnp_Amount: Number(cart.totalPrice),
+//         vnp_IpAddr: req.ip || "127.0.0.1",
+//         vnp_ReturnUrl: "http://localhost:3000/api/checkout/vnpay-callback",
+//         vnp_TxnRef: orderId,
+//         vnp_OrderInfo: `orderId=${orderId}`,
+//         vnp_OrderType: ProductCode.Other,
+//         vnp_Locale: VnpLocale.VN,
+//         vnp_CreateDate: dateFormat(new Date()),
+//         vnp_ExpireDate: dateFormat(tomorrow),
+//       });
+
+//       return res.status(200).json({
+//         message: "Tạo đơn hàng VNPAY thành công",
+//         paymentUrl,
+//         orderId,
+//       });
+//     }
+
+//     return res.status(400).json({ error: "Loại thanh toán không hợp lệ" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+//   }
+// };
 export const createCheckout = async (req: AuthRequest, res: Response) => {
   try {
     const { typePayment } = req.body;
@@ -29,98 +166,41 @@ export const createCheckout = async (req: AuthRequest, res: Response) => {
     const checkoutCol = await checkoutCollection.getCollection();
     const cartCol = await cartCollection.getCollection();
 
-    const client: MongoClient | undefined =
-      (checkoutCol as any).s?.client || (checkoutCol as any).client;
-    let session: ClientSession | undefined;
-
     const cart = await cartCol.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
-    }
+    if (!cart) return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
 
-    const snapshotTotalPrice = toIntegerAmount(cart.totalPrice);
-    let snapshotFinalPrice = toIntegerAmount(cart.finalPrice);
-    if (snapshotFinalPrice === 0) snapshotFinalPrice = snapshotTotalPrice;
+    const totalPrice = Number(cart.totalPrice) || 0;
+    const finalPrice = Number(cart.finalPrice) || totalPrice;
+    const orderId = generatePayID();
+
+    const orderData = {
+      orderId,
+      userId,
+      products: cart.products || [],
+      totalPrice,
+      finalPrice,
+      fullName: cart.fullName || "",
+      phoneNumber: cart.phoneNumber || "",
+      address: cart.address || "",
+      email: cart.email || "",
+      paymentMethod: typePayment,
+      status: "pending",
+      createdAt: new Date(),
+    };
 
     if (typePayment === "cod") {
-      const orderId = generatePayID();
-
-      const orderData = {
-        orderId,
-        userId,
-        products: cart.products || [],
-        totalPrice: snapshotTotalPrice,
-        finalPrice: snapshotFinalPrice,
-        fullName: cart.fullName || "",
-        phoneNumber: cart.phoneNumber || "",
-        address: cart.address || "",
-        email: cart.email || "",
-        paymentMethod: "cod",
-        status: "pending",
-        createdAt: new Date(),
-      };
-      if (client) {
-        session = client.startSession();
-        await session.withTransaction(async () => {
-          await checkoutCol.insertOne(orderData, { session });
-          await cartCol.updateOne(
-            { userId },
-            {
-              $set: {
-                products: [],
-                totalPrice: 0,
-                finalPrice: 0,
-                fullName: "",
-                phoneNumber: "",
-                address: "",
-                email: "",
-              },
-            },
-            { session }
-          );
-        });
-        session.endSession();
-      } else {
-        await checkoutCol.insertOne(orderData);
-        await cartCol.updateOne(
-          { userId },
-          {
-            $set: {
-              products: [],
-              totalPrice: 0,
-              finalPrice: 0,
-              fullName: "",
-              phoneNumber: "",
-              address: "",
-              email: "",
-            },
-          }
-        );
-      }
+      await checkoutCol.insertOne(orderData);
+      await cartCol.updateOne({ userId }, { $set: emptyCart() });
 
       return res.status(200).json({
-        message: "Tạo đơn hàng COD thành công",
+        message: "Đơn COD đã tạo thành công",
         orderId,
         metadata: { order: orderData },
       });
     }
-    if (typePayment === "vnpay") {
-      const orderId = generatePayID();
 
-      await checkoutCol.insertOne({
-        orderId,
-        userId,
-        products: cart.products,
-        totalPrice: snapshotTotalPrice,
-        finalPrice: snapshotFinalPrice,
-        fullName: cart.fullName,
-        phoneNumber: cart.phoneNumber,
-        address: cart.address,
-        email: cart.email,
-        paymentMethod: "vnpay",
-        status: "pending",
-        createdAt: new Date(),
-      });
+    if (typePayment === "vnpay") {
+      await checkoutCol.insertOne(orderData);
 
       const vnpay = new VNPay({
         tmnCode: "E5GKRD4W",
@@ -130,11 +210,8 @@ export const createCheckout = async (req: AuthRequest, res: Response) => {
         loggerFn: ignoreLogger,
       });
 
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
       const paymentUrl = vnpay.buildPaymentUrl({
-        vnp_Amount: Number(cart.totalPrice),
+        vnp_Amount: finalPrice,
         vnp_IpAddr: req.ip || "127.0.0.1",
         vnp_ReturnUrl: "http://localhost:3000/api/checkout/vnpay-callback",
         vnp_TxnRef: orderId,
@@ -142,7 +219,7 @@ export const createCheckout = async (req: AuthRequest, res: Response) => {
         vnp_OrderType: ProductCode.Other,
         vnp_Locale: VnpLocale.VN,
         vnp_CreateDate: dateFormat(new Date()),
-        vnp_ExpireDate: dateFormat(tomorrow),
+        vnp_ExpireDate: dateFormat(new Date(Date.now() + 86400000)),
       });
 
       return res.status(200).json({
@@ -153,11 +230,23 @@ export const createCheckout = async (req: AuthRequest, res: Response) => {
     }
 
     return res.status(400).json({ error: "Loại thanh toán không hợp lệ" });
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
+
+function emptyCart() {
+  return {
+    products: [],
+    totalPrice: 0,
+    finalPrice: 0,
+    fullName: "",
+    phoneNumber: "",
+    address: "",
+    email: "",
+  };
+}
 
 export const vnpayCallback = async (req: Request, res: Response) => {
   try {

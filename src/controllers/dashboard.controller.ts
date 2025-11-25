@@ -23,6 +23,56 @@ export const getDashboardData = async (req: Request, res: Response) => {
       0
     );
 
+    const currentYear = new Date().getFullYear();
+
+    const monthlyRevenueRaw = await checkoutCol
+      .aggregate([
+        {
+          $match: {
+            status: { $in: ["pending", "success"] },
+            createdAt: {
+              $gte: new Date(currentYear, 0, 1), // ngày 1/1 năm nay
+              $lte: new Date(currentYear, 11, 31, 23, 59), // ngày 31/12 năm nay
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { month: { $month: "$createdAt" } },
+            revenue: {
+              $sum: { $ifNull: ["$finalPrice", "$totalPrice"] },
+            },
+            transactions: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.month": 1 } },
+      ])
+      .toArray();
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const monthlyRevenue = monthNames.map((name, index) => {
+      const record = monthlyRevenueRaw.find((m) => m._id.month === index + 1);
+      return {
+        month: name,
+        revenue: record?.revenue ?? 0,
+        transactions: record?.transactions ?? 0,
+      };
+    });
+
     return res.json({
       message: "Dashboard data fetched successfully",
       data: {
@@ -30,6 +80,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
         totalUsers,
         totalOrders,
         totalRevenue,
+        monthlyRevenue,
       },
     });
   } catch (error) {
