@@ -103,6 +103,7 @@ export default function Cart() {
                 <div className="flex lg:justify-center justify-between">
                   <div className="flex items-center">
                     <button
+                      type="button"
                       onClick={() => decreaseQuantity(item.productId)}
                       className="w-9 h-9 flex items-center justify-center border rounded-md text-lg font-semibold"
                     >
@@ -114,6 +115,7 @@ export default function Cart() {
                     </span>
 
                     <button
+                      type="button"
                       onClick={() => increaseQuantity(item.productId)}
                       className="w-9 h-9 flex items-center justify-center border rounded-md text-lg font-semibold"
                     >
@@ -122,6 +124,7 @@ export default function Cart() {
                   </div>
                   <div className="sm:hidden flex">
                     <button
+                      type="button"
                       onClick={() => removeFromCart(item.productId)}
                       className="text-gray-400 hover:text-red-500 transition text-xl"
                     >

@@ -177,7 +177,7 @@ export default function CategoryManager() {
       </div>
 
       <Modal
-        title={isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
+        title={isEdit ? "Chỉnh sửa sản phẩm" : "Thêm danh mục mới"}
         open={isModalOpen}
         onCancel={handleClose}
         footer={null}

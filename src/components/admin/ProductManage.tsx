@@ -232,7 +232,7 @@ export default function ProductManager() {
               {products.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-6 text-center text-gray-500">
-                    Không có sản phẩm nào .
+                    Không có sản phẩm nào.
                   </td>
                 </tr>
               )}

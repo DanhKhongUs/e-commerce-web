@@ -77,7 +77,7 @@ export default function OrdersManage() {
                   key={order.id}
                   className="hover:bg-gray-50 transition-colors duration-200"
                 >
-                  <td className="p-4">
+                  <td className="p-4 w-[400px]">
                     <div className="flex items-center gap-3">
                       <img
                         src={order.products[0]?.imageUrl}
@@ -86,7 +86,7 @@ export default function OrdersManage() {
                       />
 
                       <div>
-                        <p className="font-semibold text-gray-800">
+                        <p className="font-semibold text-gray-800 line-clamp-1">
                           {order.products[0]?.name}
                         </p>
 

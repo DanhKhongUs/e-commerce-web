@@ -7,7 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   faCartShopping,
   faDollarSign,
@@ -25,27 +25,14 @@ export default function DashboardTable() {
     totalRevenue: number;
   } | null>(null);
 
-  const revenueData = useMemo(
-    () => [
-      { month: "Jan", revenue: 25000000, transactions: 120 },
-      { month: "Feb", revenue: 30000000, transactions: 150 },
-      { month: "Mar", revenue: 45000000, transactions: 200 },
-      { month: "Apr", revenue: 42000000, transactions: 180 },
-      { month: "May", revenue: 48000000, transactions: 210 },
-      { month: "Jun", revenue: 52000000, transactions: 240 },
-      { month: "Jul", revenue: 60000000, transactions: 260 },
-      { month: "Aug", revenue: 64000000, transactions: 300 },
-      { month: "Sep", revenue: 70000000, transactions: 310 },
-      { month: "Oct", revenue: 72000000, transactions: 340 },
-    ],
-    []
-  );
+  const [revenueData, setRevenueData] = useState([]);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const res = await httpRequest("/admin/dashboard");
         setDashboard(res.data.data);
+        setRevenueData(res.data.data.monthlyRevenue);
       } catch (error) {
         console.error(error);
       }
@@ -54,7 +41,7 @@ export default function DashboardTable() {
   }, []);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow p-5 flex items-center gap-4">
           <div className="bg-blue-100 text-blue-600 p-3 rounded-full">
@@ -103,28 +90,58 @@ export default function DashboardTable() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Doanh thu</h2>
+      <div className="rounded-xl bg-white shadow-lg border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900">
+            Doanh thu theo tháng
+          </h2>
+        </div>
 
-        <ResponsiveContainer width="100%" height={500}>
-          <LineChart data={revenueData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-            <XAxis dataKey="month" stroke="#888" />
-            <YAxis width="auto" />
-            <Tooltip
-              formatter={(value: number) =>
-                value.toLocaleString("vi-VN") + "VND"
-              }
-            />
-            <Line
-              type="monotone"
-              dataKey="revenue"
-              stroke="#3b82f6"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div className="h-[550px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={revenueData}
+              margin={{ top: 15, right: 20, bottom: 5, left: 0 }}
+            >
+              <CartesianGrid stroke="#f0f0f0" strokeDasharray="4 4" />
+
+              <XAxis
+                dataKey="month"
+                tick={{ fill: "#6b7280", fontSize: 14 }}
+                axisLine={{ stroke: "#e5e7eb" }}
+              />
+
+              <YAxis
+                width={80}
+                domain={[0, 10000000]}
+                tickFormatter={(value) => value.toLocaleString("vi-VN")}
+                tick={{ fill: "#6b7280", fontSize: 14 }}
+                axisLine={{ stroke: "#e5e7eb" }}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "white",
+                  borderRadius: "10px",
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                }}
+                formatter={(value: number) =>
+                  value.toLocaleString("vi-VN") + " VND"
+                }
+              />
+
+              <Line
+                type="monotone"
+                dataKey="revenue"
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ r: 5, strokeWidth: 2, fill: "#3b82f6", stroke: "white" }}
+                activeDot={{ r: 7 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cart, setCart] = useState<ICart | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadCart();
@@ -58,28 +58,77 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       console.error(error);
     }
   };
+
   const removeFromCart = async (productId: string) => {
+    if (!cart) return;
+
+    const removedItem = cart.products.find((p) => p.productId === productId);
+    if (!removedItem) return;
+
+    setCart((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        products: prev.products.filter((p) => p.productId !== productId),
+        totalPrice:
+          (prev.totalPrice ?? 0) - removedItem.price * removedItem.quantity,
+      };
+    });
+
     try {
       await deleteCart(productId);
-      await loadCart();
     } catch (error) {
       console.error(error);
     }
   };
 
   const increaseQuantity = async (productId: string) => {
-    const item = cart?.products.find((p) => p.productId === productId);
+    if (!cart) return;
+    const item = cart.products.find((p) => p.productId === productId);
     if (!item) return;
-    await updateCart(productId, item.quantity + 1);
-    await loadCart();
+
+    setCart((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        products: prev.products.map((p) =>
+          p.productId === productId ? { ...p, quantity: p.quantity + 1 } : p
+        ),
+        totalPrice: (prev.totalPrice ?? 0) + item.price,
+      };
+    });
+
+    try {
+      await updateCart(productId, item.quantity + 1);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const decreaseQuantity = async (productId: string) => {
-    const item = cart?.products.find((p) => p.productId === productId);
-    if (!item || item.quantity <= 1) return;
+    if (!cart) return;
+    const item = cart.products.find((p) => p.productId === productId);
+    if (!item) return;
 
-    await updateCart(productId, item.quantity - 1);
-    await loadCart();
+    setCart((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        products: prev.products.map((p) =>
+          p.productId === productId ? { ...p, quantity: p.quantity - 1 } : p
+        ),
+        totalPrice: (prev.totalPrice ?? 0) - item.price,
+      };
+    });
+
+    try {
+      await updateCart(productId, item.quantity + 1);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const clearCart = () => {
