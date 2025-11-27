@@ -1,3 +1,7 @@
+//Ở đây cần làm thêm chỉnh sửa trạng thái của đơn hàng từ pending thành success
+
+//Ở quản lý users thì thêm sửa thông tin tài khoản, cập nhập trạng thái cho user đó vd như chặn,...
+
 import { useState, useEffect } from "react";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,7 +45,7 @@ export default function OrdersManage() {
     if (!window.confirm("Bạn có chắc muốn xóa đơn hàng này?")) return;
 
     try {
-      await httpRequest.delete(`/admin/order/${id}`);
+      await httpRequest.delete(`/admin/orders/${id}`);
       await fetchOrders();
       toast.success("Đã xóa thành công.");
     } catch (error) {
