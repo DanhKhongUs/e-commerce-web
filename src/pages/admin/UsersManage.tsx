@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBan,
+  faPenToSquare,
+  faTrashCan,
+  faUnlock,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import httpRequest from "../../utils/httpRequest";
 import { toast } from "react-toastify";
@@ -11,10 +16,14 @@ interface UserProps {
   role: string;
   created_at: string;
   avatar?: string;
+  isBlocked: boolean;
 }
 
 export default function UsersManage() {
   const [users, setUsers] = useState<UserProps[]>([]);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -26,6 +35,36 @@ export default function UsersManage() {
       setUsers(res.data);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const startEdit = (user: UserProps) => {
+    setEditId(user._id);
+    setEditName(user.name);
+    setEditEmail(user.email);
+  };
+
+  const saveEdit = async (id: string) => {
+    try {
+      await httpRequest.put(`/admin/users/${id}`, {
+        name: editName,
+        email: editEmail,
+      });
+      toast.success("Cập nhật thành công!");
+      setEditId(null);
+      fetchUsers();
+    } catch (error) {
+      toast.error("Lỗi khi cập nhật");
+    }
+  };
+
+  const toggleBlock = async (id: string, isBlocked: boolean) => {
+    try {
+      await httpRequest.put(`/admin/users/${id}/block`, { block: !isBlocked });
+      toast.success(isBlocked ? "Đã mở chặn" : "Đã chặn người dùng");
+      fetchUsers();
+    } catch {
+      toast.error("Không thể thực hiện thao tác");
     }
   };
 
@@ -67,37 +106,56 @@ export default function UsersManage() {
               {users.map((user) => (
                 <tr
                   key={user._id}
-                  className="hover:bg-gray-50 transition-colors duration-200"
+                  className={
+                    "transition-colors duration-200 " +
+                    (user.isBlocked ? "bg-red-50" : "hover:bg-gray-50")
+                  }
                 >
                   <td className="p-4">
-                    <div className="flex items-center gap-4">
-                      {user.avatar ? (
-                        <img
-                          src={user.avatar}
-                          alt="avatar"
-                          className="w-12 h-12 rounded-full object-cover border"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
-                          {user.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                    {editId === user._id ? (
+                      <input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="border p-2 rounded w-full"
+                      />
+                    ) : (
+                      <div className="flex items-center gap-4">
+                        {user.avatar ? (
+                          <img
+                            src={user.avatar}
+                            className="w-12 h-12 rounded-full object-cover border"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
 
-                      <div>
-                        <p className="font-semibold text-gray-800">
-                          {user.name}
-                        </p>
-                        <p className="text-gray-500 text-sm">{user.email}</p>
+                        <div>
+                          <p className="font-semibold text-gray-800">
+                            {user.name}
+                          </p>
+                          <p className="text-gray-500 text-sm">{user.email}</p>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </td>
 
-                  <td className="p-4 text-gray-700">{user.email}</td>
+                  <td className="p-4 text-gray-700">
+                    {editId === user._id ? (
+                      <input
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        className="border p-2 rounded w-full"
+                      />
+                    ) : (
+                      user.email
+                    )}
+                  </td>
 
                   <td className="p-4">
                     <span
-                      className={`px-2 py-1 rounded-md font-medium 
-                      ${
+                      className={`px-2 py-1 rounded-md font-medium ${
                         user.role === "admin"
                           ? "bg-red-100 text-red-600"
                           : "bg-blue-100 text-blue-600"
@@ -106,15 +164,43 @@ export default function UsersManage() {
                       {user.role}
                     </span>
                   </td>
-
                   <td className="p-4 text-gray-700">
                     {new Date(user.created_at).toLocaleDateString("vi-VN")}
                   </td>
 
-                  <td className="p-4 text-center">
+                  <td className="p-4 text-center space-x-4">
+                    {editId === user._id ? (
+                      <button
+                        onClick={() => saveEdit(user._id)}
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                      >
+                        Lưu
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => startEdit(user)}
+                        className="text-blue-500 hover:text-blue-400"
+                        title="Chỉnh sửa"
+                      >
+                        <FontAwesomeIcon icon={faPenToSquare} size="lg" />
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => toggleBlock(user._id, user.isBlocked)}
+                      className="text-yellow-600 hover:text-yellow-500"
+                      title={user.isBlocked ? "Mở chặn" : "Chặn người dùng"}
+                    >
+                      <FontAwesomeIcon
+                        icon={user.isBlocked ? faUnlock : faBan}
+                        size="lg"
+                      />
+                    </button>
+
+                    {/* DELETE */}
                     <button
                       onClick={() => handleDelete(user._id)}
-                      className="text-red-500 hover:text-red-400 transition"
+                      className="text-red-500 hover:text-red-400"
                       title="Xóa người dùng"
                     >
                       <FontAwesomeIcon icon={faTrashCan} size="lg" />
