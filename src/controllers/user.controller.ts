@@ -52,6 +52,10 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (!user) return res.status(404).json({ error: "ACCOUNT_NOT_FOUND" });
 
+    if (user.isBlocked) {
+      return res.status(403).json({ error: "Tài khoản này đã bị chặn" });
+    }
+
     const hmac = crypto.createHmac("sha256", process.env.CRYPT_SECRET!);
 
     hmac.update(password);
@@ -117,12 +121,71 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const col = await userCollection.getCollection();
     const users = await col.find().sort({ created_at: -1 }).toArray();
 
-    if (!users) return res.status(404).json({ error: "USERS_NOT_FOUND" });
-
-    res.json(users);
+    return res.json(users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+    return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { name, email } = req.body;
+
+    const col = await userCollection.getCollection();
+
+    const user = await col.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      return res.status(404).json({ error: "USER_NOT_FOUND" });
+    }
+
+    await col.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          name,
+          email,
+        },
+      }
+    );
+
+    return res.json({ success: true, message: "User updated successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+  }
+};
+
+export const toggleBlockUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { block } = req.body;
+
+    const col = await userCollection.getCollection();
+
+    const user = await col.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      return res.status(404).json({ error: "USER_NOT_FOUND" });
+    }
+
+    await col.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          isBlocked: Boolean(block),
+        },
+      }
+    );
+
+    return res.json({
+      success: true,
+      message: block ? "User has been blocked" : "User has been unblocked",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
 
@@ -130,12 +193,20 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const col = await userCollection.getCollection();
-    const users = await col.findOne({ _id: new ObjectId(id) });
-    if (!users) return res.status(404).json({ error: "USER_NOT_FOUND" });
+
+    const user = await col.findOne({ _id: new ObjectId(id) });
+    if (!user) {
+      return res.status(404).json({ error: "USER_NOT_FOUND" });
+    }
+
     await col.deleteOne({ _id: new ObjectId(id) });
-    return res.json({ success: true, message: "User deleted successfully" });
+
+    return res.json({
+      success: true,
+      message: "User deleted successfully",
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
+    return res.status(500).json({ error: "INTERNAL_SERVER_ERROR" });
   }
 };
